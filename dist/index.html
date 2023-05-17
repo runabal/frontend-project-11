@@ -1,19 +1,4 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8" />
-        <title>Webpack App</title>
-    <script defer src="main.js"></script></head>
-    <body>
-      <div class ="conteiner m-3">
-        <form class="form-inline">
-        <input type ="text" required="required" class="form-control mr-3" name ="name">
-        <button type ="submit" class="btn btn-primary mr-3">Добавить</button>
-    </form>   
-    </body>
-    
-    <script>
-        if ("serviceWorker" in navigator) {
+<!doctype html><html><head><meta charset="utf-8"/><title>Webpack App</title><script defer="defer" src="main.js"></script></head><body><div class="conteiner m-3"><form class="form-inline"><input required="required" class="form-control mr-3" name="name"> <button type="submit" class="btn btn-primary mr-3">Добавить</button></form></div></body><script>if ("serviceWorker" in navigator) {
             window.addEventListener("load", () => {
                 navigator.serviceWorker
                     .register("service-worker.js")
@@ -24,6 +9,4 @@
                         console.error("Service Worker registration failed: ", registrationError);
                     });
             });
-        }
-    </script>
-</html>
+        }</script></html>
