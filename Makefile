@@ -14,6 +14,6 @@ lint:
 	npx eslint .
 
 
-PHONY: test
+.PHONY: test
 
 
