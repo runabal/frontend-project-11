@@ -3,50 +3,56 @@ import * as yup from 'yup';
 import axios from 'axios';
 
 
-export const routes = {
-  usersPath: () => '/users',
+export let existingWebsites = [];
+
+export const validateDuplicates = (fields) => {
+const { website } = fields;
+const isDuplicate = existingWebsites.includes(website);
+if(isDuplicate) {
+return {website: 'This URL already exists' };
+}
+existingWebsites.push(website);
+return null;
+};
+console.log(existingWebsites);
+
+
+export const updateExistingWebsites = (newwebsites) => {
+existingWebsites = [...existingWebsites, ...newWebsites];
 };
 
 export const schema = yup.object().shape({
-   website: yup.string().required("URL field is required").url(),
+   website: yup
+  .string()
+  .required("URL field is required")
+  .url('Invalid URL')
+  .notOneOf(existingWebsites, 'This url already exists'),
 });
 
 export const errorMessages = {
   network: {
-    error: 'Network Problems. Try again.',
-  },
+ error: 'Network Problems. Try again',
+    },
 };
 
-export let existingWebsites = [];
+export const handleProcessStateSuccess = () => {
+  elements.container.innerHTML = 'RSS added successfully!';
+  elements.fields.website.value = '';
+};
 
-export const validateDuplicates = (fields) => {
-   const { website } = fields;
-   const isDuplicate = existingWebsites.includes(website);
- if(isDuplicate) {
-  return {website: 'This URL already exists' };
- }
-existingWebsites.push(website);
-
-return null;
-
+export const handleProcessStateDuplicate = () => {
+element.container.innerHTML = 'This URL already exists';
 };
 
 export const validate = (fields) => {
- try {
+try {
  const { website } = fields;
- 
+
  const schemaErrors = schema.validateSync(fields, { abortEarly: false });
- const duplicateErrors = validateDuplicates(fields);
-
-if (duplicateErrors) {
-  return {website: 'This URL already exists'};
-}
- return { ..._.keyBy(schemaErrors.inner, 'path'), ...(duplicateErrors ? duplicateErrors : {}) };
- 
-  } catch (e) {
+  return { ..._.keyBy(schemaErrors.inner, 'path') };
+} catch (e) {
   return _.keyBy(e.inner, 'path');
- }
-
+}
 };
 
 export const handleProcessState = (elements, processState) => {
@@ -67,8 +73,6 @@ export const handleProcessState = (elements, processState) => {
       throw new Error('Unknown process state!');
   }
 };
-
-console.log(existingWebsites);
 
 export const handleProcessError = () => {};
 
@@ -143,4 +147,3 @@ export const render = (elements, initialState) => (path, value, prevValue) => {
       break;
   }
 };
-
