@@ -3,62 +3,62 @@ import * as yup from 'yup';
 import axios from 'axios';
 
 
-export let urls = [];
+export let existingWebsites = [];
+
+export const validateDuplicates = (fields) => {
+   const { website } = fields;
+   const isDuplicate = existingWebsites.includes(website);
+ if(isDuplicate) {
+  return {website: 'This URL already exists' };
+}
+existingWebsites.push(website);
+return { website: 'RSs added succesfully'};
+};
+console.log(existingWebsites);
 
 
-export const updateUrls = (newUrls) => {
-urls = newUrls;
+export const updateExistingWebsites = (newWebsites) => {
+existingWebsites =[...existingWebsites, ...newWebsites];
+console.log('Existing Websites:', existingWebsites);
 };
 
 
-export const validateDuplicates = (fields, urls) => {
-const {website} = fields;
-const isDuplicate = urls.includes(website);
-if (isDuplicate) {
-  return Promise.reject({website: 'This URL already exists'});
- }
-urls.push(website);
-console.log(urls);
-return validate(website, urls)
-  .then((error) => {
-    if (error) {
-     state.form.errors = { website: error };
-     state.form.valid = false;
-   } else {
-     state.form.errors = {};
-    state.form.valid = true;
-   }
-   })
-  .catch ((error) => {
-   console.log(error);
-  });
-};
+export const schema = yup.object().shape({
+   website: yup
+  .string()
+  .required("URL field is required")
+  .url('Invalid URL')
+  .notOneOf(existingWebsites, 'This url already exists'),
+});
 
 export const errorMessages = {
   network: {
-    error: 'Network Problems. Try again',
+ error: 'Network Problems. Try again',
     },
 };
 
-export const handleProcessStateSuccess = (elements) => {
+export const handleProcessStateSuccess = () => {
   elements.container.innerHTML = 'RSS added successfully!';
-  elements.fields.website.value = '';
 };
 
-export const handleProcessStateDuplicate = (elements) => {
+export const handleProcessStateDuplicate = () => {
 element.container.innerHTML = 'This URL already exists';
 };
 
-export const validate = (url, urls) => {
+export const validate = (fields) => {
+ try {
+ const { website } = fields;
 
- const schema = yup
-  .string()
-  .url('Invalid URL')
-  .required('URL field is required')
-   return schema
-  .notOneOf(urls)
-  .then(() => null)
-  .catch((error) => error.message);
+ const schemaErrors = schema.validateSync(fields, { abortEarly: false });
+
+// const duplicateErrors = validateDuplicates(fields);
+//if (duplicateErrors) {
+ // return {website: 'This URL already exists'};
+  // }
+  return { ..._.keyBy(schemaErrors.inner, 'path') };
+} catch (e) {
+  return _.keyBy(e.inner, 'path');
+}
 };
 
 export const handleProcessState = (elements, processState) => {
@@ -153,3 +153,4 @@ export const render = (elements, initialState) => (path, value, prevValue) => {
       break;
   }
 };
+

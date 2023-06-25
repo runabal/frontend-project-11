@@ -1,7 +1,7 @@
 import _  from 'lodash';
 import * as yup from 'yup';
 import axios from 'axios';
-import {schema, errorMessages, validate, validateDuplicates, handleProcessState, handleProcessError, renderError, renderErrors, render, existingWebsites } from './application.js';
+import {validate, validateDuplicates, handleProcessState,handleProcessError, handleProcessStateDuplicate, handleProcessStateSuccess, renderError, renderErrors, render, urls, updateUrls} from './application.js';
 import onChange from 'on-change';
 
 
@@ -44,13 +44,18 @@ const state = onChange(initialState, (path, value, prevValue) => {
   state.form.fields[fieldName] = value;
   state.form.fieldsUi.touched[fieldName] = true;
 
-  const errors = validate(state.form.fields);
-  state.form.errors = errors;
-  state.form.valid = _.isEmpty(errors);
+
+  validate(state.form.fields.website)
+  .then(() => {
+     state.form.errors = {};
+    state.form.valid = true;
+  })
+  .catch((error) => {
+   state.form.errors = {website: error.message };
+   state.form.valid = false;
+    });
   });
 });
-
-updateExistingWebsites(existingWebsites);
 
 elements.form.addEventListener('submit', (e) => {
 e.preventDefault();
@@ -62,13 +67,14 @@ const data ={
   website: state.form.fields.website,
 };
 
-const duplicateErrors = validateDuplicates(data);
+const duplicateErrors = validateDuplicates(data, urls);
 if (duplicateErrors) {
 state.form.errors = duplicateErrors;
 state.form.valid = false;
-handleProcessStateDuplicate();
+handleProcessStateDuplicate(elements);
 return;
 }
+
 
 axios
   .post(routes.userPath(), data)
@@ -76,7 +82,7 @@ axios
     state.form.processState = 'sent';
     state.form.valid = true;
     elements.fields.website.focus()
-    handleProcessStateSuccess();
+    handleProcessStateSuccess(elements);
 })
   .catch ((err) => {
     state.form.processState = 'error';
