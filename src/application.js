@@ -1,155 +1,177 @@
-import _ from 'lodash';
-import * as yup from 'yup';
-import axios from 'axios';
+import _ from "lodash";
+import * as yup from "yup";
+import axios from "axios";
+import onChange from "on-change";
+import parser from "./parser.js";
+import watcher from "./view.js";
+import i18next from "i18next";
+import languages from "./translate/languages.js";
 
-
-export let urls = [];
-
-
-export const updateUrls = (newUrls) => {
-urls = newUrls;
+const validate = (url, feeds) => {
+  const schema = yup.string().required().url().notOneOf(feeds);
+  return schema.validate(url, { abortEarly: false });
 };
 
+const getProxyedUrl = (url) => {
+  const proxy = "https://allorigins.hexlet.app";
+  const params = { disableCache: true, url };
 
-export const validateDuplicates = (fields, urls) => {
-const {website} = fields;
-const isDuplicate = urls.includes(website);
-if (isDuplicate) {
-  return Promise.reject({website: 'This URL already exists'});
- }
-urls.push(website);
-console.log(urls);
-return validate(website, urls)
-  .then((error) => {
-    if (error) {
-     state.form.errors = { website: error };
-     state.form.valid = false;
-   } else {
-     state.form.errors = {};
-    state.form.valid = true;
-   }
-   })
-  .catch ((error) => {
-   console.log(error);
-  });
+  const proxyUrl = new URL("/get", proxy);
+  proxyUrl.search = new URLSearchParams(params);
+  return proxyUrl.toString();
 };
 
-export const errorMessages = {
-  network: {
-    error: 'Network Problems. Try again',
+export default () => {
+  const elements = {
+    form: document.querySelector(".rss-form"),
+    input: document.querySelector("#url-input"),
+    button: document.querySelector(".btn-primary.px-sm-5"),
+    feedback: document.querySelector("#error-message"),
+    feeds: document.querySelector(".feeds"),
+    posts: document.querySelector(".posts"),
+    modalFade: document.querySelector("#modal"),
+    modalTitle: document.querySelector(".modal-title"),
+    body: document.querySelector(".modal-body"),
+    redirect: document.querySelector(".full-article"),
+  };
+
+  const defaultLanguage = "ru";
+  const delay = 5000;
+  const i18n = i18next.createInstance();
+
+  i18n
+    .init({
+      lng: defaultLanguage,
+      debug: true,
+      resources: languages,
+    })
+    .then(() => {
+      yup.setLocale({
+        string: {
+          url: "errors.urlError",
+        },
+        mixed: {
+          notOneof: "errors.alreadyExist",
+        },
+      });
+    });
+
+  const processStateHandler = (state) => {
+    if (state.processState === "loading") {
+      return "loading";
+    }
+    if (state.processState === "finished") {
+      return "finished";
+    }
+    return "failed";
+  };
+
+  const formStateHandler = (state) => {
+    if (state.formState === "filling") {
+      return "filling";
+    }
+    if (state.formState === "sending") {
+      return "sending";
+    }
+    return "failed";
+  };
+
+  const state = {
+    form: {
+      conditions: "",
+      errors: "",
     },
-};
+    process: {
+      conditions: "",
+      errors: "",
+    },
+    links: [],
+    feeds: [],
+    posts: [],
+    currentPosts: {},
+    alreadyReadPosts: [],
+  };
 
-export const handleProcessStateSuccess = (elements) => {
-  elements.container.innerHTML = 'RSS added successfully!';
-  elements.fields.website.value = '';
-};
+  const watchedState = watcher(elements, i18n, state);
 
-export const handleProcessStateDuplicate = (elements) => {
-element.container.innerHTML = 'This URL already exists';
-};
+  const updatePosts = () => {
+    const { feeds, posts } = state;
 
-export const validate = (url, urls) => {
+    const promises = feeds.map((feed) => {
+      const url = getProxyedUrl(feed.link);
+      return axios.get(url).then((response) => {
+        const data = parser(response.data.contents);
+        const currentPosts = data.posts.map((post) => ({
+          ...post,
+          id: feed.id,
+        }));
+        const oldPosts = posts.filter((post) => post.id === feed.id);
+        const newPosts = _.differenceWith(currentPosts, oldPosts, _.isEqual);
 
- const schema = yup
-  .string()
-  .url('Invalid URL')
-  .required('URL field is required')
-   return schema
-  .notOneOf(urls)
-  .then(() => null)
-  .catch((error) => error.message);
-};
+        if (newPosts.length > 0) {
+          newPosts.forEach((post) => {
+            watchedState.posts.push(post);
+          });
+        }
+      });
+    });
+    return Promise.all(promises)
+      .catch((err) => {
+        watchedState.process.conditions = "failed";
+        watchedState.process.errors = err.name;
+      })
+      .finally(() => {
+        setTimeout(updatePosts, delay);
+      });
+  };
 
-export const handleProcessState = (elements, processState) => {
-  switch (processState) {
-    case 'sent':
-      elements.container.innerHTML = 'RSS added succesfully!';
-      break;
-    case 'error':
-      elements.submitButton.disabled = false;
-      break;
-    case 'sending':
-      elements.submitButton.disabled = true;
-      break;
-    case 'filling':
-      elements.submitButton.disabled = false;
-      break;
-    default:
-      throw new Error('Unknown process state!');
-  }
-};
+  elements.form.addEventListener("submit", (e) => {
+    e.preventDefault();
 
-export const handleProcessError = () => {};
+    const form = new FormData(e.target);
+    const url = form.get("url");
 
-export const renderError = (fieldElement, error) => {
-  const feedbackElement = fieldElement.nextElementSibling;
-  if (feedbackElement) {
-    feedbackElement.textContent = error.message;
-    return;
-}
+    validate(url, watchedState.links)
+      .then((validUrl) => {
+        watchedState.process.conditions = "loading";
+        watchedState.process.errors = null;
+        axios
+          .get(getProxyedUrl(validUrl))
+          .then((response) => {
+            const { feed, posts } = parser(response.data.contents);
 
-fieldElement.classList.add('is-invalid');
-fieldElement.classList.remove('is-valid');
+            watchedState.links.push(validUrl);
+            watchedState.process.conditions = "success";
+            watchedState.form.conditions = "";
+            watchedState.form.errors = null;
 
-const newFeedbackElement = document.createElement('div');
-newFeedbackElement.classList.add('invalid-feedback');
-newFeedbackElement.textContent = error.message;
-fieldElement.after(newFeedbackElement);
-};
-
-export const clearErrors = (elements) => {
-   Object.values(elements.fields).forEach((fieldElement) => {
-      fieldElement.classList.remove('is-valid');
-      fieldElement.classList.remove('is-invalid');
-
-      const feedbackElement = fieldElement.nextElementSibling;
-      if (feedbackElement) {
-        feedbackElement.remove();
-}
-})
-};
-
-export const renderErrors = (elements, errors, prevErrors, state) => {
-  Object.entries(elements.fields).forEach(([fieldName, fieldElement]) => {
-    const error = errors[fieldName];
-    const fieldHadError = _.has(prevErrors, fieldName);
-    const fieldHasError = _.has(errors, fieldName);
-    if (!fieldHadError && !fieldHasError) {
-      return;
-  }
-
-  if (fieldHadError && !fieldHasError) {
-    fieldElement.classList.add('is-valid');
-    fieldElement.classList.remove('is-invalid');
-   const feedbackElement = fieldElement.nextElementSibling;
-   if (feedbackElement) {
-     feedbackElement.remove();
-   }
-    return;
-  }
-  if (state.form.fieldsUi.touched[fieldName] && fieldHasError) {
-    renderError(fieldElement, error);
-  }
+            const id = _.uniqueId();
+            watchedState.feeds.push({ ...feed, id, link: validUrl });
+            posts.forEach((post) => watchedState.posts.push({ ...post, id }));
+          })
+          .catch((err) => {
+            watchedState.process.conditions = "failed";
+            watchedState.process.errors = err.name;
+            watchedState.form.conditions = "";
+            watchedState.form.errors = "";
+          });
+      })
+      .catch((err) => {
+        watchedState.form.conditions = "failed";
+        watchedState.form.errors = err.errors ? err.errors.join() : "Ошибка";
+        watchedState.process.conditions = "";
+        watchedState.process.errors = null;
+      });
   });
-};
 
-export const render = (elements, initialState) => (path, value, prevValue) => {
-  clearErrors(elements); 
-  switch (path) {
-    case 'form.processState':
-      handleProcessState(elements, value);
-      break;
-    case 'form.processError':
-      handleProcessError();
-      break;
-    case 'form.valid':
-      elements.submitButton.disabled = !value;
-      break;
-    case 'form.errors':
-      renderErrors(elements, value, prevValue, initialState);
-      break;
-    default:
-      break;
-  }
+  elements.posts.addEventListener("click", (e) => {
+    const currentLink = e.target.href ?? e.target.previousElementSibling.href;
+    const currentPost = state.posts.find((item) => item.link === currentLink);
+    watchedState.currentPosts = currentPost;
+
+    if (!state.alreadyReadPosts.includes(currentPost)) {
+      state.alreadyReadPosts.push(currentPost);
+    }
+  });
+  updatePosts();
 };

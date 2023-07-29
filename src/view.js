@@ -1,93 +1,194 @@
-import _  from 'lodash';
-import * as yup from 'yup';
-import axios from 'axios';
-import {validate, validateDuplicates, handleProcessState,handleProcessError, handleProcessStateDuplicate, handleProcessStateSuccess, renderError, renderErrors, render, urls, updateUrls} from './application.js';
-import onChange from 'on-change';
+import onChange from "on-change";
+import i18next from "i18next";
 
+const renderFeeds = (elements, i18n, value) => {
+  const { feeds } = elements;
+  const header = document.createElement("h2");
+  header.textContent = i18n.t("feeds");
 
-export default () => {
+  const feedList = document.createElement("ul");
+  feedList.classList.add("list-group", "mb-5");
 
-  const elements = {
-    container: document.getElementsByClassName('row')[0],
-    form: document.getElementsByClassName('form-floating')[0],
-    fields: {
-    website: document.getElementById('url-input'),
-  },
-  submitButton: document.querySelector('button[type="submit"]'),
-  };
-  const initialState = {
-    form: {
-      valid: true,
-      processState: 'filling',
-      processError: null,
-      errors: {},
-      fields: {
-      website: '',
-   },
-    fieldsUi: {
-      touched: {
-        website: false,
-      },
-    },
-  },
-};
+  value.forEach((item) => {
+    const feed = document.createElement("li");
+    feed.classList.add("list-group-item");
 
+    const feedHeader = document.createElement("h3");
+    feedHeader.textContent = item.title;
 
-const state = onChange(initialState, (path, value, prevValue) => {
-  render(elements, initialState)(path, value, prevValue);
-});
-  const fields = Object.entries(elements.fields);
-  
-  fields.forEach(([fieldName, fieldElement]) => {
-  fieldElement.addEventListener('input', (e) => {
-  const {value} = e.target;
-  state.form.fields[fieldName] = value;
-  state.form.fieldsUi.touched[fieldName] = true;
+    const feedDescription = document.createElement("p");
+    feedDescription.textContent = item.description;
 
-
-  validate(state.form.fields.website)
-  .then(() => {
-     state.form.errors = {};
-    state.form.valid = true;
-  })
-  .catch((error) => {
-   state.form.errors = {website: error.message };
-   state.form.valid = false;
-    });
+    feed.append(feedHeader, feedDescription);
+    feedList.prepend(feed);
   });
-});
 
-elements.form.addEventListener('submit', (e) => {
-e.preventDefault();
-
-state.form.processState = 'sending';
-state.form.processError = null;
-
-const data ={
-  website: state.form.fields.website,
+  feeds.innerHTML = "";
+  feeds.append(header, feedList);
 };
 
-const duplicateErrors = validateDuplicates(data, urls);
-if (duplicateErrors) {
-state.form.errors = duplicateErrors;
-state.form.valid = false;
-handleProcessStateDuplicate(elements);
-return;
-}
+const renderModalWindow = (elements, currentPost) => {
+  const { modalTitle, body, redirect } = elements;
+  const titles = elements.posts.querySelectorAll("a");
 
+  titles.forEach((title) => {
+    if (title.href !== currentPost.link) {
+      return;
+    }
 
-axios
-  .post(routes.userPath(), data)
-  .then(() => {
-    state.form.processState = 'sent';
-    state.form.valid = true;
-    elements.fields.website.focus()
-    handleProcessStateSuccess(elements);
-})
-  .catch ((err) => {
-    state.form.processState = 'error';
-    state.form.processError = errorMessages.network.error;
-    throw err;
-})
-})
+    title.classList.remove("fw-bold");
+    title.classList.add("fw-normal");
+    modalTitle.textContent = currentPost.title;
+    body.textContent = currentPost.description;
+    redirect.href = currentPost.link;
+  });
+};
+
+const renderPosts = (elements, i18n, value, state) => {
+  const { posts } = elements;
+  const header = document.createElement("h2");
+  header.textContent = i18n.t("posts");
+
+  const fragment = document.createDocumentFragment();
+
+  const postsList = document.createElement("ul");
+  postsList.classList.add("list-group");
+
+  value.forEach((item) => {
+    const { title, link, id } = item;
+
+    const post = document.createElement("li");
+    post.classList.add("list-group-item", "d-flex");
+    post.classList.add("justify-content-between", "align-items-start");
+
+    const titleEl = document.createElement("a");
+    titleEl.textContent = title;
+    const textClass = state.alreadyReadPosts.includes(item)
+      ? "fw-normal"
+      : "fw-bold";
+    titleEl.classList.add(textClass);
+
+    titleEl.setAttribute("href", link);
+    titleEl.setAttribute("target", "_blank");
+    titleEl.setAttribute("rel", "noopener noreferrer");
+
+    const watchButton = document.createElement("button");
+    watchButton.textContent = "inspect";
+    watchButton.classList.add("btn", "btn-primary", "btn-sm");
+    watchButton.setAttribute("type", "button");
+
+    watchButton.dataset.id = id;
+    watchButton.dataset.bsToggle = "modal";
+    watchButton.dataset.bsTarget = "#modal";
+
+    post.append(titleEl, watchButton);
+    fragment.prepend(post);
+  });
+  posts.innerHTML = "";
+  postsList.append(fragment);
+  posts.append(header, postsList);
+};
+
+const renderErrors = (elements, i18n, value) => {
+  if (!value) {
+    return;
+  }
+  const { feedback } = elements;
+
+  switch (value) {
+    case "errors.urlError":
+      feedback.textContent = i18n.t(value);
+      break;
+
+    case "errors.alreadyExist":
+      feedback.textContent = i18n.t(value);
+      break;
+
+    case "AxiosError":
+      feedback.textContent = i18n.t("errors.networkError");
+      break;
+
+    case "Error":
+      feedback.textContent = i18n.t("errors.rssError");
+      break;
+
+    default:
+      feedback.textContent = i18n.t("errors.somethingWrong");
+      break;
+  }
+};
+
+const handleProcessSubmit = (elements) => {
+  const { form, input, button } = elements;
+  form.reset();
+  input.focus();
+  button.disabled = false;
+};
+
+const renderStatus = (elements, i18n, value) => {
+  const { input, feedback, button } = elements;
+
+  switch (value) {
+    case null:
+      break;
+
+    case "loading":
+      button.disabled = true;
+      feedback.classList.remove("text-danger");
+      feedback.classList.remove("text-success");
+      feedback.classList.add("text-secondary");
+      feedback.textContent = i18n.t(value);
+      break;
+
+    case "success":
+      input.classList.remove("is-invalid");
+      feedback.classList.replace("text-secondary", "text-success");
+      feedback.textContent = i18n.t(value);
+      break;
+
+    case "failed":
+      input.classList.add("is-invalid");
+      feedback.classList.remove("text-success");
+      feedback.classList.remove("text-secondary");
+      feedback.classList.add("text-danger");
+      button.disabled = false;
+      break;
+
+    default:
+      break;
+  }
+};
+
+export default (elements, i18n, state) => {
+  const processFormHandler = onChange(state, (path, value) => {
+    switch (path) {
+      case "process.conditions":
+        renderStatus(elements, i18n, value);
+        break;
+      case "form.conditions":
+        renderStatus(elements, i18n, value);
+        break;
+      case "links":
+        handleProcessSubmit(elements);
+        break;
+      case "process.errors":
+        renderErrors(elements, i18n, value);
+        break;
+      case "form.errors":
+        renderErrors(elements, i18n, value);
+        break;
+      case "feeds":
+        renderFeeds(elements, i18n, value);
+        break;
+      case "posts":
+        renderPosts(elements, i18n, value, state);
+        break;
+      case "currentPosts":
+        renderModalWindow(elements, value);
+        break;
+      default:
+        break;
+    }
+  });
+  return processFormHandler;
 };
