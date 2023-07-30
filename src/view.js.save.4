@@ -1,0 +1,46 @@
+import _  from 'lodash';
+import * as yup from 'yup';
+import axios from 'axios';
+import {validateUrl, validateDuplicates, handleProcessState,handleProcessError, 
+handleProcessStateDuplicate, handleProcessStateSuccess, renderError, renderErrors, render, urls, updateUrls} from './application.js';
+import onChange from 'on-change';
+
+
+export default () => {
+
+  const elements = {
+    container: document.getElementsByClassName('row')[0],
+    form: document.getElementsByClassName('form-floating')[0],
+    fields: {
+    website: document.getElementById('url-input'),
+  },
+  submitButton: document.querySelector('button[type="submit"]'),
+  };
+  const initialState = {
+    form: {
+      valid: true,
+      processState: 'filling',
+      processError: null,
+      errors: {},
+      fields: {
+      url: '',
+   },
+    fieldsUi: {
+      touched: {
+        url: false,
+      },
+    },
+  },
+};
+
+
+const state = onChange(initialState, (path, value, prevValue) => {
+  render(elements, initialState)(path, value, prevValue);
+});
+
+const handleInput = (e) => {
+  const {value} = e.target;
+  state.form.fields.url = value;
+  state.form.fieldsUi.touched.url = true;
+
+
