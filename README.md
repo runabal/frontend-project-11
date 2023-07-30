@@ -5,7 +5,9 @@
 ### Discription project
 ## RSS-agregator
 ```
-RSS is a specialized format designed to describe news feeds, announcements of articles and other materials. It allows you to add an unlimited number of RSS feeds, updates them itself and adds new entries to the general stream.
+RSS-agregator is a specialized format designed to describe news feeds,
+announcements of articles and other materials. It allows you to add an unlimited
+number of RSS feeds, updates them itself and adds new entries to the general stream.
 ```
 ## Installation
 ```
