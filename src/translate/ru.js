@@ -3,7 +3,7 @@ export default {
     errors: {
       urlError: "Ссылка должна быть валидным URL",
       alreadyExist: "RSS уже существует",
-      rssError: "Ресурс не содержит валидной ссылки",
+      rssError: "Ресурс не содержит валидной RSS",
       networkError: "Ошибка сети, попробуйте позже",
       somethingWrong: "Что-то пошло не так",
     },
