@@ -1,10 +1,10 @@
-import _ from 'lodash';
-import * as yup from 'yup';
-import axios from 'axios';
-import i18next from 'i18next';
-import parser from './parser.js';
-import watcher from './view.js';
-import languages from './translate/languages.js';
+import _ from "lodash";
+import * as yup from "yup";
+import axios from "axios";
+import i18next from "i18next";
+import parser from "./parser.js";
+import watcher from "./view.js";
+import languages from "./translate/languages.js";
 
 const validate = (url, feeds) => {
   const schema = yup.string().required().url().notOneOf(feeds);
@@ -12,29 +12,29 @@ const validate = (url, feeds) => {
 };
 
 const getProxyedUrl = (url) => {
-  const proxy = 'https://allorigins.hexlet.app';
+  const proxy = "https://allorigins.hexlet.app";
   const params = { disableCache: true, url };
 
-  const proxyUrl = new URL('/get', proxy);
+  const proxyUrl = new URL("/get", proxy);
   proxyUrl.search = new URLSearchParams(params);
   return proxyUrl.toString();
 };
 
 export default () => {
   const elements = {
-    form: document.querySelector('.rss-form'),
-    input: document.querySelector('#url-input'),
-    button: document.querySelector('.h-100'),
-    feedback: document.querySelector('.feedback'),
-    feeds: document.querySelector('.feeds'),
-    posts: document.querySelector('.posts'),
-    modalFade: document.querySelector('#modal'),
-    modalTitle: document.querySelector('#modal .modal-title'),
-    body: document.querySelector('#modal .modal-body'),
-    redirect: document.querySelector('#modal a'),
+    form: document.querySelector(".rss-form"),
+    input: document.querySelector("#url-input"),
+    button: document.querySelector(".h-100"),
+    feedback: document.querySelector(".feedback"),
+    feeds: document.querySelector(".feeds"),
+    posts: document.querySelector(".posts"),
+    modalFade: document.querySelector("#modal"),
+    modalTitle: document.querySelector("#modal .modal-title"),
+    body: document.querySelector("#modal .modal-body"),
+    redirect: document.querySelector("#modal a"),
   };
 
-  const defaultLanguage = 'ru';
+  const defaultLanguage = "ru";
   const delay = 5000;
   const i18n = i18next.createInstance();
 
@@ -47,22 +47,22 @@ export default () => {
     .then(() => {
       yup.setLocale({
         string: {
-          url: 'errors.urlError',
+          url: "errors.urlError",
         },
         mixed: {
-          notOneOf: 'errors.alreadyExist',
+          notOneOf: "errors.alreadyExist",
         },
       });
     });
 
   const state = {
     form: {
-      conditions: '',
-      errors: '',
+      conditions: "",
+      errors: "",
     },
     process: {
-      conditions: '',
-      errors: '',
+      conditions: "",
+      errors: "",
     },
     links: [],
     feeds: [],
@@ -96,7 +96,7 @@ export default () => {
     });
     return Promise.all(promises)
       .catch((err) => {
-        watchedState.process.conditions = 'failed';
+        watchedState.process.conditions = "failed";
         watchedState.process.errors = err.name;
       })
       .finally(() => {
@@ -104,15 +104,15 @@ export default () => {
       });
   };
 
-  elements.form.addEventListener('submit', (e) => {
+  elements.form.addEventListener("submit", (e) => {
     e.preventDefault();
 
     const form = new FormData(e.target);
-    const url = form.get('url');
+    const url = form.get("url");
 
     validate(url, watchedState.links)
       .then((validUrl) => {
-        watchedState.process.conditions = 'loading';
+        watchedState.process.conditions = "loading";
         watchedState.process.errors = null;
         axios
           .get(getProxyedUrl(validUrl))
@@ -120,8 +120,8 @@ export default () => {
             const { feed, posts } = parser(response.data.contents);
 
             watchedState.links.push(validUrl);
-            watchedState.process.conditions = 'success';
-            watchedState.form.conditions = '';
+            watchedState.process.conditions = "success";
+            watchedState.form.conditions = "";
             watchedState.form.errors = null;
 
             const id = _.uniqueId();
@@ -129,21 +129,21 @@ export default () => {
             posts.forEach((post) => watchedState.posts.push({ ...post, id }));
           })
           .catch((err) => {
-            watchedState.process.conditions = 'failed';
+            watchedState.process.conditions = "failed";
             watchedState.process.errors = err.message;
-            watchedState.form.conditions = '';
+            watchedState.form.conditions = "";
             watchedState.form.errors = null;
           });
       })
       .catch((err) => {
-        watchedState.form.conditions = 'failed';
+        watchedState.form.conditions = "failed";
         watchedState.form.errors = err.errors.join();
-        watchedState.process.conditions = '';
+        watchedState.process.conditions = "";
         watchedState.process.errors = null;
       });
   });
 
-  elements.posts.addEventListener('click', (e) => {
+  elements.posts.addEventListener("click", (e) => {
     const currentLink = e.target.href ?? e.target.previousElementSibling.href;
     const currentPost = state.posts.find((item) => item.link === currentLink);
     watchedState.currentPosts = currentPost;
