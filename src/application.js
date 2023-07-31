@@ -35,7 +35,7 @@ export default () => {
   };
 
   const defaultLanguage = "ru";
-  const delay = 10000;
+  const delay = 5000;
   const i18n = i18next.createInstance();
 
   i18n
