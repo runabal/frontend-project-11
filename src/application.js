@@ -130,7 +130,7 @@ export default () => {
           })
           .catch((err) => {
             watchedState.process.conditions = "failed";
-            watchedState.process.errors = err.message;
+            watchedState.process.errors = err.name;
             watchedState.form.conditions = "";
             watchedState.form.errors = null;
           });
