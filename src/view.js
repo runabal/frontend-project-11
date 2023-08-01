@@ -72,7 +72,7 @@ const renderPosts = (elements, i18n, value, state) => {
     titleEl.setAttribute("rel", "noopener noreferrer");
 
     const watchButton = document.createElement("button");
-    watchButton.textContent = "inspect";
+    watchButton.textContent = i18n.t("inspect");
     watchButton.classList.add("btn", "btn-primary", "btn-sm");
     watchButton.setAttribute("type", "button");
 
