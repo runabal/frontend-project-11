@@ -5,8 +5,10 @@ module.exports = {
   },
   overrides: [],
   parserOptions: {
-    ecmaVersion: "latest",
-    sourceType: "module",
+    ecmaVersion: 'latest',
+    sourceType: 'module',
   },
-  rules: {},
+  rules: {
+    quotes: ['error', 'single']
+  }
 };

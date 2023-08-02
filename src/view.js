@@ -1,42 +1,42 @@
-import onChange from "on-change";
+import onChange from 'on-change';
 
 const renderFeeds = (elements, i18n, value) => {
   const { feeds } = elements;
-  const header = document.createElement("h2");
-  header.textContent = i18n.t("feeds");
+  const header = document.createElement('h2');
+  header.textContent = i18n.t('feeds');
 
-  const feedList = document.createElement("ul");
-  feedList.classList.add("list-group", "mb-5");
+  const feedList = document.createElement('ul');
+  feedList.classList.add('list-group', 'mb-5');
 
   value.forEach((item) => {
-    const feed = document.createElement("li");
-    feed.classList.add("list-group-item");
+    const feed = document.createElement('li');
+    feed.classList.add('list-group-item');
 
-    const feedHeader = document.createElement("h3");
+    const feedHeader = document.createElement('h3');
     feedHeader.textContent = item.title;
 
-    const feedDescription = document.createElement("p");
+    const feedDescription = document.createElement('p');
     feedDescription.textContent = item.description;
 
     feed.append(feedHeader, feedDescription);
     feedList.prepend(feed);
   });
 
-  feeds.innerHTML = "";
+  feeds.innerHTML = '';
   feeds.append(header, feedList);
 };
 
 const renderModalWindow = (elements, currentPost) => {
   const { modalTitle, body, redirect } = elements;
-  const titles = elements.posts.querySelectorAll("a");
+  const titles = elements.posts.querySelectorAll('a');
 
   titles.forEach((title) => {
     if (title.href !== currentPost.link) {
       return;
     }
 
-    title.classList.remove("fw-bold");
-    title.classList.add("fw-normal");
+    title.classList.remove('fw-bold');
+    title.classList.add('fw-normal');
     modalTitle.textContent = currentPost.title;
     body.textContent = currentPost.description;
     redirect.href = currentPost.link;
@@ -45,45 +45,45 @@ const renderModalWindow = (elements, currentPost) => {
 
 const renderPosts = (elements, i18n, value, state) => {
   const { posts } = elements;
-  const header = document.createElement("h2");
-  header.textContent = i18n.t("posts");
+  const header = document.createElement('h2');
+  header.textContent = i18n.t('posts');
 
   const fragment = document.createDocumentFragment();
 
-  const postsList = document.createElement("ul");
-  postsList.classList.add("list-group");
+  const postsList = document.createElement('ul');
+  postsList.classList.add('list-group');
 
   value.forEach((item) => {
     const { title, link, id } = item;
 
-    const post = document.createElement("li");
-    post.classList.add("list-group-item", "d-flex");
-    post.classList.add("justify-content-between", "align-items-start");
+    const post = document.createElement('li');
+    post.classList.add('list-group-item', 'd-flex');
+    post.classList.add('justify-content-between', 'align-items-start');
 
-    const titleEl = document.createElement("a");
+    const titleEl = document.createElement('a');
     titleEl.textContent = title;
     const textClass = state.alreadyReadPosts.includes(item)
-      ? "fw-normal"
-      : "fw-bold";
+      ? 'fw-normal'
+      : 'fw-bold';
     titleEl.classList.add(textClass);
 
-    titleEl.setAttribute("href", link);
-    titleEl.setAttribute("target", "_blank");
-    titleEl.setAttribute("rel", "noopener noreferrer");
+    titleEl.setAttribute('href', link);
+    titleEl.setAttribute('target', '_blank');
+    titleEl.setAttribute('rel', 'noopener noreferrer');
 
-    const watchButton = document.createElement("button");
-    watchButton.textContent = i18n.t("inspect");
-    watchButton.classList.add("btn", "btn-primary", "btn-sm");
-    watchButton.setAttribute("type", "button");
+    const watchButton = document.createElement('button');
+    watchButton.textContent = i18n.t('inspect');
+    watchButton.classList.add('btn', 'btn-primary', 'btn-sm');
+    watchButton.setAttribute('type', 'button');
 
     watchButton.dataset.id = id;
-    watchButton.dataset.bsToggle = "modal";
-    watchButton.dataset.bsTarget = "#modal";
+    watchButton.dataset.bsToggle = 'modal';
+    watchButton.dataset.bsTarget = '#modal';
 
     post.append(titleEl, watchButton);
     fragment.prepend(post);
   });
-  posts.innerHTML = "";
+  posts.innerHTML = '';
   postsList.append(fragment);
   posts.append(header, postsList);
 };
@@ -95,24 +95,24 @@ const renderErrors = (elements, i18n, value) => {
   const { feedback } = elements;
 
   switch (value) {
-    case "errors.urlError":
+    case 'errors.urlError':
       feedback.textContent = i18n.t(value);
       break;
 
-    case "errors.alreadyExist":
+    case 'errors.alreadyExist':
       feedback.textContent = i18n.t(value);
       break;
 
-    case "AxiosError":
-      feedback.textContent = i18n.t("errors.networkError");
+    case 'AxiosError':
+      feedback.textContent = i18n.t('errors.networkError');
       break;
 
-    case "Error":
-      feedback.textContent = i18n.t("errors.rssError");
+    case 'Error':
+      feedback.textContent = i18n.t('errors.rssError');
       break;
 
     default:
-      feedback.textContent = i18n.t("errors.somethingWrong");
+      feedback.textContent = i18n.t('errors.somethingWrong');
       break;
   }
 };
@@ -131,25 +131,25 @@ const renderStatus = (elements, i18n, value) => {
     case null:
       break;
 
-    case "loading":
+    case 'loading':
       button.disabled = true;
-      feedback.classList.remove("text-danger");
-      feedback.classList.remove("text-success");
-      feedback.classList.add("text-secondary");
+      feedback.classList.remove('text-danger');
+      feedback.classList.remove('text-success');
+      feedback.classList.add('text-secondary');
       feedback.textContent = i18n.t(value);
       break;
 
-    case "success":
-      input.classList.remove("is-invalid");
-      feedback.classList.replace("text-secondary", "text-success");
+    case 'success':
+      input.classList.remove('is-invalid');
+      feedback.classList.replace('text-secondary', 'text-success');
       feedback.textContent = i18n.t(value);
       break;
 
-    case "failed":
-      input.classList.add("is-invalid");
-      feedback.classList.remove("text-success");
-      feedback.classList.remove("text-secondary");
-      feedback.classList.add("text-danger");
+    case 'failed':
+      input.classList.add('is-invalid');
+      feedback.classList.remove('text-success');
+      feedback.classList.remove('text-secondary');
+      feedback.classList.add('text-danger');
       button.disabled = false;
       break;
 
@@ -161,28 +161,28 @@ const renderStatus = (elements, i18n, value) => {
 export default (elements, i18n, state) => {
   const processFormHandler = onChange(state, (path, value) => {
     switch (path) {
-      case "process.conditions":
+      case 'process.conditions':
         renderStatus(elements, i18n, value);
         break;
-      case "form.conditions":
+      case 'form.conditions':
         renderStatus(elements, i18n, value);
         break;
-      case "links":
+      case 'links':
         handleProcessSubmit(elements);
         break;
-      case "process.errors":
+      case 'process.errors':
         renderErrors(elements, i18n, value);
         break;
-      case "form.errors":
+      case 'form.errors':
         renderErrors(elements, i18n, value);
         break;
-      case "feeds":
+      case 'feeds':
         renderFeeds(elements, i18n, value);
         break;
-      case "posts":
+      case 'posts':
         renderPosts(elements, i18n, value, state);
         break;
-      case "currentPosts":
+      case 'currentPosts':
         renderModalWindow(elements, value);
         break;
       default:
