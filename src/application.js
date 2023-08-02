@@ -11,7 +11,7 @@ const validate = (url, feeds) => {
   return schema.validate(url, { abortEarly: false });
 };
 
-const getProxyedUrl = (url) => {
+const getProxyUrl = (url) => {
   const proxy = "https://allorigins.hexlet.app";
   const params = { disableCache: true, url };
 
@@ -77,7 +77,7 @@ export default () => {
     const { feeds, posts } = state;
 
     const promises = feeds.map((feed) => {
-      const url = getProxyedUrl(feed.link);
+      const url = getProxyUrl(feed.link);
       return axios.get(url).then((response) => {
         const data = parser(response.data.contents);
         const currentPosts = data.posts.map((post) => ({
@@ -94,7 +94,7 @@ export default () => {
         }
       });
     });
-    return Promise.all(promises)
+    Promise.all(promises)
       .catch((err) => {
         watchedState.process.conditions = "failed";
         watchedState.process.errors = err.name;
@@ -115,7 +115,7 @@ export default () => {
         watchedState.process.conditions = "loading";
         watchedState.process.errors = null;
         axios
-          .get(getProxyedUrl(validUrl))
+          .get(getProxyUrl(validUrl))
           .then((response) => {
             const { feed, posts } = parser(response.data.contents);
 
