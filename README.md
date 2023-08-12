@@ -17,11 +17,17 @@ number of RSS feeds, updates them itself and adds new entries to the general str
 ## Installation
 
 ```
-npm ci
+make installation
 ```
 
 ## Starting a local server
 
 ```
-npx webpack serve
+make start
+```
+
+## Build in webpzck
+
+```
+make build
 ```
