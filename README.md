@@ -26,7 +26,7 @@ make installation
 make start
 ```
 
-## Build in webpzck
+## Build in webpack
 
 ```
 make build
