@@ -1,6 +1,7 @@
 ### Hexlet tests and linter status:
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/feabb81fb1f20adb2d69/maintainability)](https://codeclimate.com/github/runabal/frontend-project-11/maintainability)
+[![hexlet-check](https://github.com/runabal/frontend-project-11/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/runabal/frontend-project-11/actions/workflows/hexlet-check.yml)
 
 ## RSS-agregator
 https://frontend-project-11-7yafylapy-runabal.vercel.app/
