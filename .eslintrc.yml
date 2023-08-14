@@ -1,21 +1,16 @@
 env:
   browser: true
   es2021: true
-  node: true
-
 extends: airbnb-base
-
 overrides: []
-
 parserOptions:
   ecmaVersion: latest
   sourceType: module
-
-rules:
-  no-console: 0
+rules: 
+  quotes:
+    - error
+    - single
   import/extensions:
     - error
-    - ignorePackages
+    - always
     - js: always
-  no-underscore-dangle: [2, { "allow": ["__filename", "__dirmame"] }]
-  linebreak-syle: 0
