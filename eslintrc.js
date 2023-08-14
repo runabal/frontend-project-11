@@ -3,12 +3,11 @@ module.exports = {
     browser: true,
     es2021: true,
   },
-  overrides: [],
   parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
+    ecmaVersion: "latest",
+    sourceType: "module",
   },
   rules: {
-    quotes: ['error', 'single'],
+    quotes: ["error", "single"],
   },
 };
