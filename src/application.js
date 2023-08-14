@@ -47,13 +47,13 @@ export default () => {
     .then(() => {
       yup.setLocale({
         string: {
-          url: 'errors.urlError',
+          url: languages.ru.translation.errors.urlError,
         },
         mixed: {
-          notOneOf: 'errors.alreadyExist',
+          notOneOf: languages.ru.translation.errors.alreadyExist,
         },
       });
-    });
+
 
   const state = {
     form: {
@@ -153,4 +153,5 @@ export default () => {
     }
   });
   updatePosts();
+});
 };
