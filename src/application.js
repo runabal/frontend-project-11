@@ -130,9 +130,9 @@ export default () => {
           })
           .catch((err) => {
             watchedState.process.conditions = 'failed';
-            watchedState.process.errors = err.name;
+            watchedState.form.errors = err.name;
             watchedState.form.conditions = '';
-            watchedState.form.errors = null;
+            watchedState.process.errors = null;
           });
       })
       .catch((err) => {
@@ -147,10 +147,6 @@ export default () => {
     const currentLink = e.target.href ?? e.target.previousElementSibling.href;
     const currentPost = state.posts.find((item) => item.link === currentLink);
     watchedState.currentPosts = currentPost;
-
-    if (!state.alreadyReadPosts.includes(currentPost)) {
-      state.alreadyReadPosts.push(currentPost);
-    }
   });
   updatePosts();
 });
