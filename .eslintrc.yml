@@ -16,7 +16,7 @@ rules:
     - js: always
 
   no-underscore-dangle:
-    - 2
+    - 1
     - allow:
         - __filename
         - __dirname
