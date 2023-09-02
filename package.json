@@ -1,6 +1,7 @@
 {
   "name": "@hexlet/code",
   "version": "1.0.0",
+  "type": "module",
   "description": "Project 3 - RSS agregator",
   "main": "./src/index.js",
   "scripts": {

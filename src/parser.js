@@ -1,9 +1,9 @@
 const getPosts = (data) => {
-  const items = data.querySelectorAll('channel > item');
+  const items = data.querySelectorAll("channel > item");
   return [...items].map((item) => {
-    const title = item.querySelector('title').textContent;
-    const description = item.querySelector('description').textContent;
-    const link = item.querySelector('link').textContent;
+    const title = item.querySelector("title").textContent;
+    const description = item.querySelector("description").textContent;
+    const link = item.querySelector("link").textContent;
 
     return {
       title,
@@ -14,14 +14,14 @@ const getPosts = (data) => {
 };
 
 const getFeed = (data) => {
-  const title = data.querySelector('channel > title').textContent;
-  const description = data.querySelector('channel > description').textContent;
+  const title = data.querySelector("channel > title").textContent;
+  const description = data.querySelector("channel > description").textContent;
   return { title, description };
 };
 export default (rss) => {
   const parser = new DOMParser();
-  const doc = parser.parseFromString(rss, 'text/xml');
-  const parserError = doc.querySelector('parsererror');
+  const doc = parser.parseFromString(rss, "text/xml");
+  const parserError = doc.querySelector("parsererror");
 
   if (parserError) {
     throw new Error(parserError);
