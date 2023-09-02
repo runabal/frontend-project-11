@@ -14,9 +14,8 @@ rules:
     - error
     - ignorePackages
     - js: always
-
   no-underscore-dangle:
     - 1
     - allow:
-        - __filename
-        - __dirname
+      - __filename
+      - __dirname
