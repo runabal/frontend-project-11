@@ -47,10 +47,10 @@ export default () => {
     .then(() => {
       yup.setLocale({
         string: {
-          url: languages.ru.translation.errors.urlError,
+          url: 'errors.urlError',
         },
         mixed: {
-          notOneOf: languages.ru.translation.errors.alreadyExist,
+          notOneOf: 'errors.alreadyExist',
         },
       });
 

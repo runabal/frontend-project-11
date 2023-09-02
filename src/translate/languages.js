@@ -1,7 +1,3 @@
-import ruTranslations from './ru.js';
+import ru from './ru.js';
 
-const languages = {
-  ru: ruTranslations,
-};
-
-export default languages;
+export default { ru };
