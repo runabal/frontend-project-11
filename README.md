@@ -6,8 +6,7 @@
 
 ## RSS-agregator
 
-#### https://frontend-project-11-7yafylapy-runabal.vercel.app/
-
+#### https://frontend-project-11-4oblcadgt-runabal.vercel.app/
 ```
 RSS-agregator is a specialized format designed to describe news feeds,
 announcements of articles and other materials. It allows you to add an unlimited
