@@ -7,15 +7,17 @@ import watcher from './view.js';
 import languages from './translate/languages.js';
 import customMessages from './translate/customMessages.js';
 
+const defaultLanguage = 'ru';
+const delay = 5000;
+const proxy = 'https://allorigins.hexlet.app';
+
 const validate = (url, feeds) => {
   const schema = yup.string().required().url().notOneOf(feeds);
   return schema.validate(url, { abortEarly: false });
 };
 
 const getProxyUrl = (url) => {
-  const proxy = 'https://allorigins.hexlet.app';
   const params = { disableCache: true, url };
-
   const proxyUrl = new URL('/get', proxy);
   proxyUrl.search = new URLSearchParams(params);
   return proxyUrl.toString();
@@ -35,8 +37,6 @@ export default () => {
     redirect: document.querySelector('#modal a'),
   };
 
-  const defaultLanguage = 'ru';
-  const delay = 5000;
   const i18n = i18next.createInstance();
 
   i18n
@@ -61,7 +61,7 @@ export default () => {
     links: [],
     feeds: [],
     posts: [],
-    currentPosts: {},
+    currentPost: {},
     alreadyReadPosts: [],
   };
 
@@ -74,13 +74,13 @@ export default () => {
       const url = getProxyUrl(feed.link);
       return axios.get(url).then((response) => {
         const data = parser(response.data.contents);
-        const currentPosts = data.posts.map((post) => ({
+        const currentPost = data.posts.map((post) => ({
           ...post,
           id: feed.id,
         }));
         const oldPosts = posts.filter((post) => post.id === feed.id);
         const newPosts = _.differenceWith(
-          currentPosts,
+          currentPost,
           oldPosts,
           _.isEqual,
         );
@@ -123,7 +123,7 @@ export default () => {
             watchedState.form.errors = null;
 
             const id = _.uniqueId();
-            watchedState.feeds.push({ ...feed, id, link: validUrl });
+            watchedState.feeds.push({ ...feed, id, link: url });
             posts.forEach((post) => watchedState.posts.push({ ...post, id }));
           })
           .catch((err) => {
@@ -146,7 +146,7 @@ export default () => {
     const currentPost = state.posts.find(
       (item) => item.link === currentLink,
     );
-    watchedState.currentPosts = currentPost;
+    watchedState.currentPost = currentPost;
   });
   updatePosts();
 };
