@@ -7,9 +7,9 @@ import watcher from './view.js';
 import languages from './translate/languages.js';
 import customMessages from './translate/customMessages.js';
 
+const proxy = 'https://allorigins.hexlet.app';
 const defaultLanguage = 'ru';
 const delay = 5000;
-const proxy = 'https://allorigins.hexlet.app';
 
 const validate = (url, feeds) => {
   const schema = yup.string().required().url().notOneOf(feeds);
@@ -123,7 +123,7 @@ export default () => {
             watchedState.form.errors = null;
 
             const id = _.uniqueId();
-            watchedState.feeds.push({ ...feed, id, link: url });
+            watchedState.feeds.push({ ...feed, id, link: validUrl });
             posts.forEach((post) => watchedState.posts.push({ ...post, id }));
           })
           .catch((err) => {
@@ -143,10 +143,10 @@ export default () => {
 
   elements.posts.addEventListener('click', (e) => {
     const currentLink = e.target.href ?? e.target.previousElementSibling.href;
-    const currentPost = state.posts.find(
+    const presentPost = state.posts.find(
       (item) => item.link === currentLink,
     );
-    watchedState.currentPost = currentPost;
+    watchedState.currentPost = presentPost;
   });
   updatePosts();
 };

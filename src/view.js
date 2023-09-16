@@ -26,20 +26,20 @@ const renderFeeds = (elements, i18n, value) => {
   feeds.append(header, feedList);
 };
 
-const renderModalWindow = (elements, currentPost) => {
+const renderModalWindow = (elements, presentPost) => {
   const { modalTitle, body, redirect } = elements;
   const titles = elements.posts.querySelectorAll('a');
 
   titles.forEach((title) => {
-    if (title.href !== currentPost.link) {
+    if (title.href !== presentPost.link) {
       return;
     }
 
     title.classList.remove('fw-bold');
     title.classList.add('fw-normal');
-    modalTitle.textContent = currentPost.title;
-    body.textContent = currentPost.description;
-    redirect.href = currentPost.link;
+    modalTitle.textContent = presentPost.title;
+    body.textContent = presentPost.description;
+    redirect.href = presentPost.link;
   });
 };
 
@@ -182,7 +182,7 @@ export default (elements, i18n, state) => {
       case 'posts':
         renderPosts(elements, i18n, value, state);
         break;
-      case 'currentPosts':
+      case 'currentPost':
         renderModalWindow(elements, value);
         break;
       default:
