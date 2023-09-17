@@ -65,7 +65,7 @@ export default () => {
     alreadyReadPosts: [],
   };
 
-  const watchedState = watcher(elements, i18n, state);
+  const watcherState = watcher(elements, i18n, state);
 
   const updatePosts = () => {
     const { feeds, posts } = state;
@@ -87,15 +87,15 @@ export default () => {
 
         if (newPosts.length > 0) {
           newPosts.forEach((post) => {
-            watchedState.posts.push(post);
+            watcherState.posts.push(post);
           });
         }
       });
     });
     Promise.all(promises)
       .catch((err) => {
-        watchedState.process.conditions = 'failed';
-        watchedState.process.errors = err.name;
+        watcherState.process.conditions = 'failed';
+        watcherState.process.errors = err.name;
       })
       .finally(() => {
         setTimeout(updatePosts, delay);
@@ -108,36 +108,36 @@ export default () => {
     const form = new FormData(e.target);
     const url = form.get('url');
 
-    validate(url, watchedState.links)
+    validate(url, watcherState.links)
       .then((validUrl) => {
-        watchedState.process.conditions = 'loading';
-        watchedState.process.errors = null;
+        watcherState.process.conditions = 'loading';
+        watcherState.process.errors = null;
         axios
           .get(getProxyUrl(validUrl))
           .then((response) => {
             const { feed, posts } = parser(response.data.contents);
 
-            watchedState.links.push(validUrl);
-            watchedState.process.conditions = 'success';
-            watchedState.form.conditions = '';
-            watchedState.form.errors = null;
+            watcherState.links.push(validUrl);
+            watcherState.process.conditions = 'success';
+            watcherState.form.conditions = '';
+            watcherState.form.errors = null;
 
             const id = _.uniqueId();
-            watchedState.feeds.push({ ...feed, id, link: validUrl });
-            posts.forEach((post) => watchedState.posts.push({ ...post, id }));
+            watcherState.feeds.push({ ...feed, id, link: validUrl });
+            posts.forEach((post) => watcherState.posts.push({ ...post, id }));
           })
           .catch((err) => {
-            watchedState.process.conditions = 'failed';
-            watchedState.form.errors = err.name;
-            watchedState.form.conditions = '';
-            watchedState.process.errors = null;
+            watcherState.process.conditions = 'failed';
+            watcherState.form.errors = err.name;
+            watcherState.form.conditions = '';
+            watcherState.process.errors = null;
           });
       })
       .catch((err) => {
-        watchedState.form.conditions = 'failed';
-        watchedState.form.errors = err.errors.join();
-        watchedState.process.conditions = '';
-        watchedState.process.errors = null;
+        watcherState.form.conditions = 'failed';
+        watcherState.form.errors = err.errors.join();
+        watcherState.process.conditions = '';
+        watcherState.process.errors = null;
       });
   });
 
@@ -146,7 +146,8 @@ export default () => {
     const presentPost = state.posts.find(
       (item) => item.link === currentLink,
     );
-    watchedState.currentPost = presentPost;
+    // watchedState.alreadyReadPosts.add(presentPost.link);
+    watcherState.currentPost = presentPost;
   });
   updatePosts();
 };
