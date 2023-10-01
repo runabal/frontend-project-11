@@ -14,7 +14,9 @@ const delay = 5000;
 const validate = (url, feeds) => {
   const feedLinks = feeds.map((feed) => feed.link);
   const schema = yup.string().required().url().notOneOf(feedLinks);
-  return schema.validate(url, { abortEarly: false });
+  return schema.validate(url, { abortEarly: false })
+    .then(() => null)
+    .catch((err) => err.errors.join());
 };
 
 const getProxyUrl = (url) => {
@@ -22,6 +24,29 @@ const getProxyUrl = (url) => {
   const proxyUrl = new URL('/get', proxy);
   proxyUrl.search = new URLSearchParams(params);
   return proxyUrl.toString();
+};
+
+const loadData = (validUrl, watcherState) => {
+  watcherState.process.conditions = 'loading';
+  watcherState.process.errors = null;
+
+  return axios.get(getProxyUrl(validUrl))
+    .then((response) => {
+      const { feed, posts } = parser(response.data.contents);
+
+      watcherState.process.conditions = 'success';
+      watcherState.form.conditions = '';
+      watcherState.form.errors = null;
+      const id = _.uniqueId();
+      watcherState.feeds.push({ ...feed, id, link: validUrl });
+      posts.forEach((post) => watcherState.posts.push({ ...post, id }));
+    })
+    .catch((err) => {
+      watcherState.process.conditions = 'failed';
+      watcherState.form.errors = err.name;
+      watcherState.form.conditions = '';
+      watcherState.process.errors = null;
+    });
 };
 
 export default () => {
@@ -109,35 +134,15 @@ export default () => {
     const url = form.get('url');
 
     validate(url, watcherState.feeds)
-      .then((validUrl) => {
-        watcherState.process.conditions = 'loading';
-        watcherState.process.errors = null;
-
-        axios
-          .get(getProxyUrl(validUrl))
-          .then((response) => {
-            const { feed, posts } = parser(response.data.contents);
-
-            watcherState.process.conditions = 'success';
-            watcherState.form.conditions = '';
-            watcherState.form.errors = null;
-
-            const id = _.uniqueId();
-            watcherState.feeds.push({ ...feed, id, link: validUrl });
-            posts.forEach((post) => watcherState.posts.push({ ...post, id }));
-          })
-          .catch((err) => {
-            watcherState.process.conditions = 'failed';
-            watcherState.form.errors = err.name;
-            watcherState.form.conditions = '';
-            watcherState.process.errors = null;
-          });
-      })
-      .catch((err) => {
-        watcherState.form.conditions = 'failed';
-        watcherState.form.errors = err.errors.join();
-        watcherState.process.conditions = '';
-        watcherState.process.errors = null;
+      .then((error) => {
+        if (error) {
+          watcherState.form.conditions = 'failed';
+          watcherState.form.errors = error;
+          watcherState.process.conditions = '';
+          watcherState.process.errors = null;
+        } else {
+          loadData(url, watcherState);
+        }
       });
   });
 
