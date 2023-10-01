@@ -62,7 +62,7 @@ export default () => {
     feeds: [],
     posts: [],
     currentPost: {},
-    alreadyReadPosts: [],
+    alreadyReadPosts: new Set(),
   };
 
   const watcherState = watcher(elements, i18n, state);
@@ -147,6 +147,7 @@ export default () => {
       (item) => item.link === currentLink,
     );
     watcherState.currentPost = presentPost;
+   watcherState.alreadyReadPosts.add(presentPost.link);
   });
   updatePosts();
 };

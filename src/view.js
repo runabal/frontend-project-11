@@ -62,7 +62,7 @@ const renderPosts = (elements, i18n, value, state) => {
 
     const titleEl = document.createElement('a');
     titleEl.textContent = title;
-    const textClass = state.alreadyReadPosts.includes(item)
+    const textClass = state.alreadyReadPosts.has(item)
       ? 'fw-normal'
       : 'fw-bold';
     titleEl.classList.add(textClass);
