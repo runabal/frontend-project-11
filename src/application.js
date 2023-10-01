@@ -107,7 +107,6 @@ export default () => {
 
     const form = new FormData(e.target);
     const url = form.get('url');
-    //    const existingLinks = watcherState.feeds.map(feed => feed.link);
 
     validate(url, watcherState.feeds)
       .then((validUrl) => {
@@ -119,7 +118,6 @@ export default () => {
           .then((response) => {
             const { feed, posts } = parser(response.data.contents);
 
-            // watcherState.feeds.push(validUrl);
             watcherState.process.conditions = 'success';
             watcherState.form.conditions = '';
             watcherState.form.errors = null;
