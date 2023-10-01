@@ -12,7 +12,8 @@ const defaultLanguage = 'ru';
 const delay = 5000;
 
 const validate = (url, feeds) => {
-  const schema = yup.string().required().url().notOneOf(feeds);
+  const feedLinks = feeds.map((feed) => feed.link);
+  const schema = yup.string().required().url().notOneOf(feedLinks);
   return schema.validate(url, { abortEarly: false });
 };
 
@@ -58,7 +59,6 @@ export default () => {
       conditions: '',
       errors: '',
     },
-    links: [],
     feeds: [],
     posts: [],
     currentPost: {},
@@ -107,17 +107,19 @@ export default () => {
 
     const form = new FormData(e.target);
     const url = form.get('url');
+    //    const existingLinks = watcherState.feeds.map(feed => feed.link);
 
-    validate(url, watcherState.links)
+    validate(url, watcherState.feeds)
       .then((validUrl) => {
         watcherState.process.conditions = 'loading';
         watcherState.process.errors = null;
+
         axios
           .get(getProxyUrl(validUrl))
           .then((response) => {
             const { feed, posts } = parser(response.data.contents);
 
-            watcherState.links.push(validUrl);
+            // watcherState.feeds.push(validUrl);
             watcherState.process.conditions = 'success';
             watcherState.form.conditions = '';
             watcherState.form.errors = null;
@@ -146,7 +148,6 @@ export default () => {
     const presentPost = state.posts.find(
       (item) => item.link === currentLink,
     );
-    // watchedState.alreadyReadPosts.add(presentPost.link);
     watcherState.currentPost = presentPost;
   });
   updatePosts();

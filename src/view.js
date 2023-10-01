@@ -140,6 +140,7 @@ const renderStatus = (elements, i18n, value) => {
       break;
 
     case 'success':
+      //      button.disabled = false;
       input.classList.remove('is-invalid');
       feedback.classList.replace('text-secondary', 'text-success');
       feedback.textContent = i18n.t(value);
@@ -167,9 +168,6 @@ export default (elements, i18n, state) => {
       case 'form.conditions':
         renderStatus(elements, i18n, value);
         break;
-      case 'links':
-        handleProcessSubmit(elements);
-        break;
       case 'process.errors':
         renderErrors(elements, i18n, value);
         break;
@@ -177,6 +175,7 @@ export default (elements, i18n, state) => {
         renderErrors(elements, i18n, value);
         break;
       case 'feeds':
+        handleProcessSubmit(elements);
         renderFeeds(elements, i18n, value);
         break;
       case 'posts':
