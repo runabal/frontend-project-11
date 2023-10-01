@@ -147,7 +147,7 @@ export default () => {
       (item) => item.link === currentLink,
     );
     watcherState.currentPost = presentPost;
-   watcherState.alreadyReadPosts.add(presentPost.link);
+    watcherState.alreadyReadPosts.add(presentPost.link);
   });
   updatePosts();
 };
