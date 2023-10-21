@@ -147,12 +147,21 @@ export default () => {
   });
 
   elements.posts.addEventListener('click', (e) => {
-    const currentLink = e.target.href ?? e.target.previousElementSibling.href;
-    const presentPost = state.posts.find(
-      (item) => item.link === currentLink,
-    );
-    watcherState.currentPost = presentPost;
-    watcherState.alreadyReadPosts.add(presentPost.link);
+    const { target } = e;
+    const postId = e.target.dataset.id;
+
+    if (postId && target.tagtName === 'BUTTON') {
+      const presentPost = state.posts.find((item) => item.id === postId);
+
+      watcherState.currentPost = presentPost;
+      watcherState.alreadyReadPosts.add(presentPost.link);
+      e.preventDefault();
+    }
+    if (target.tagName === 'A') {
+      const presentPost = state.posts.find((item) => item.link === target.href);
+      watcherState.currentPost = presentPost;
+      watcherState.alreadyReadPosts.add(presentPost.link);
+    }
   });
   updatePosts();
 };
