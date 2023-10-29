@@ -29,18 +29,18 @@ const renderFeeds = (elements, i18n, value) => {
 const renderModalWindow = (elements, presentPost) => {
   const { modalTitle, body, redirect } = elements;
 
-  modalTitle.textContent = presentPost.title;
-  body.textContent = presentPost.description;
-  redirect.href = presentPost.link;
+     modalTitle.textContent = presentPost.title;
+     body.textContent = presentPost.description;
+     redirect.href = presentPost.link;
 
-  const titles = elements.posts.querySelectorAll('a');
-  titles.forEach((title) => {
-    if (title.href !== presentPost.link) return;
-    title.classList.remove('fw-bold');
-    title.classList.add('fw-normal');
-  });
+const titles = elements.posts.querySelectorAll(`a`);
+titles.forEach((title) => {
+if(title.href !== presentPost.link) return;
+title.classList.remove('fw-bold');
+title.classList.add('fw-normal');
+
+});
 };
-
 const renderPosts = (elements, i18n, value, state) => {
   const { posts } = elements;
   const header = document.createElement('h2');
@@ -60,16 +60,16 @@ const renderPosts = (elements, i18n, value, state) => {
 
     const titleEl = document.createElement('a');
     titleEl.textContent = title;
-    const textClass = state.alreadyReadPosts.has(item)
+    const textClass = state.alreadyReadPosts.has(link)
       ? 'fw-normal'
       : 'fw-bold';
     titleEl.classList.add(textClass);
 
-    // titleEl.setAttribute('data-id', item.id);
-    titleEl.setAttribute('href', link);
+    titleEl.dataset.id = id;
+    titleEl.setAttribute('data-id', id);
     titleEl.setAttribute('target', '_blank');
     titleEl.setAttribute('rel', 'noopener noreferrer');
-    // titleEl.href = item.link;
+    titleEl.href = item.link;
 
     const watchButton = document.createElement('button');
     watchButton.textContent = i18n.t('inspect');

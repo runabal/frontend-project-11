@@ -26,6 +26,7 @@ const getProxyUrl = (url) => {
   return proxyUrl.toString();
 };
 
+
 const loadData = (validUrl, watcherState) => {
   watcherState.process.conditions = 'loading';
   watcherState.process.errors = null;
@@ -146,22 +147,41 @@ export default () => {
       });
   });
 
-  elements.posts.addEventListener('click', (e) => {
-    const { target } = e;
-    const postId = e.target.dataset.id;
+elements.posts.addEventListener('click', (e) => {
+const { target } = e;
 
-    if (postId && target.tagtName === 'BUTTON') {
-      const presentPost = state.posts.find((item) => item.id === postId);
+//const isButton = target.tagName === 'BUTTON';
+//const isLink = target.tagName === 'A';
+//if (!isButton && !isLink) return;
+//const postId = target.dataset.id;
+//const presentPost = state.posts.find((item) => item.id === postId);
+//if (!presentPost) return;
+//if (isButton) {
+//watcherState.currentPost = presentPost;
+//watcherState.alreadyReadPosts.add(presentPost.link);
+//e.preventDefault();
+//} else {
+//watcherState.currentPost = presentPost;
+//watcherState.alreadyReadPosts.add(presentPost.link);
+//}
+//});
 
-      watcherState.currentPost = presentPost;
-      watcherState.alreadyReadPosts.add(presentPost.link);
-      e.preventDefault();
-    }
-    if (target.tagName === 'A') {
-      const presentPost = state.posts.find((item) => item.link === target.href);
-      watcherState.currentPost = presentPost;
-      watcherState.alreadyReadPosts.add(presentPost.link);
-    }
-  });
-  updatePosts();
+if (target.tagName === 'BUTTON' && target.dataset.id) {
+const presentPost = state.posts.find((item) => item.id === target.dataset.id);
+if (!presentPost) return;
+
+watcherState.currentPost = presentPost;
+watcherState.alreadyReadPosts.add(presentPost.link);
+e.preventDefault();
+
+} else if (target.tagName === 'A' && target.href) {
+const presentPost = state.posts.find((item) => item.link === target.href);
+if(!presentPost) return;
+
+watcherState.currentPost = presentPost;
+watcherState.alreadyReadPosts.add(presentPost.link);
+}
+
+});
+  updatePosts(watcherState);
 };
