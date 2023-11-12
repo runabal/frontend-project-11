@@ -28,18 +28,9 @@ const renderFeeds = (elements, i18n, value) => {
 
 const renderModalWindow = (elements, presentPost) => {
   const { modalTitle, body, redirect } = elements;
-
-     modalTitle.textContent = presentPost.title;
-     body.textContent = presentPost.description;
-     redirect.href = presentPost.link;
-
-const titles = elements.posts.querySelectorAll(`a`);
-titles.forEach((title) => {
-if(title.href !== presentPost.link) return;
-title.classList.remove('fw-bold');
-title.classList.add('fw-normal');
-
-});
+  modalTitle.textContent = presentPost.title;
+  body.textContent = presentPost.description;
+  redirect.href = presentPost.link;
 };
 const renderPosts = (elements, i18n, value, state) => {
   const { posts } = elements;
@@ -59,17 +50,13 @@ const renderPosts = (elements, i18n, value, state) => {
     post.classList.add('justify-content-between', 'align-items-start');
 
     const titleEl = document.createElement('a');
-    titleEl.textContent = title;
-    const textClass = state.alreadyReadPosts.has(link)
-      ? 'fw-normal'
-      : 'fw-bold';
-    titleEl.classList.add(textClass);
-
     titleEl.dataset.id = id;
-    titleEl.setAttribute('data-id', id);
+    titleEl.textContent = title;
+    const textClass = state.alreadyReadPosts.has(id) ? 'fw-normal' : 'fw-bold';
+    titleEl.classList.add(textClass);
+    titleEl.setAttribute('href', link);
     titleEl.setAttribute('target', '_blank');
     titleEl.setAttribute('rel', 'noopener noreferrer');
-    titleEl.href = item.link;
 
     const watchButton = document.createElement('button');
     watchButton.textContent = i18n.t('inspect');
@@ -182,6 +169,9 @@ export default (elements, i18n, state) => {
         break;
       case 'currentPost':
         renderModalWindow(elements, value);
+        break;
+      case 'alreadyReadPosts':
+        renderPosts(elements, i18n, state.posts, state);
         break;
       default:
         break;
