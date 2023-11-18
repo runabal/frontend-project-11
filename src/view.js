@@ -123,7 +123,7 @@ const renderStatus = (elements, i18n, value) => {
       feedback.classList.remove('text-danger', 'text-secondary');
       feedback.classList.add('text-success');
       feedback.textContent = i18n.t('successValid');
-      button.dsabled = false;
+      button.disabled = false;
       break;
 
     case 'loading':

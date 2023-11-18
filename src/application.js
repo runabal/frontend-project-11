@@ -133,7 +133,9 @@ export default () => {
         } else {
           watcherState.form.conditions = 'valid';
           watcherState.form.errors = null;
-          loadData(url, watcherState);
+          setTimeout(() => {
+            loadData(url, watcherState);
+          }, 1000);
         }
       });
   });
