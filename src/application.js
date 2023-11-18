@@ -131,6 +131,8 @@ export default () => {
           watcherState.form.conditions = 'failed';
           watcherState.form.errors = error;
         } else {
+          watcherState.form.conditions = 'valid';
+          watcherState.form.errors = null;
           loadData(url, watcherState);
         }
       });

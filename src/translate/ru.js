@@ -7,6 +7,7 @@ export default {
       networkError: 'Ошибка сети, попробуйте позже',
       somethingWrong: 'Что-то пошло не так',
     },
+    successValid: 'URL валиден.',
     loading: 'Идет загрузка',
     success: 'RSS успешно загружен',
     posts: 'Посты',

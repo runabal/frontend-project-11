@@ -118,6 +118,14 @@ const renderStatus = (elements, i18n, value) => {
     case null:
       break;
 
+    case 'valid':
+      input.classList.remove('is-invalid');
+      feedback.classList.remove('text-danger', 'text-secondary');
+      feedback.classList.add('text-success');
+      feedback.textContent = i18n.t('successValid');
+      button.dsabled = false;
+      break;
+
     case 'loading':
       button.disabled = true;
       feedback.classList.remove('text-danger');
