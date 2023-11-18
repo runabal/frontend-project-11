@@ -45,7 +45,7 @@ const loadData = (validUrl, watcherState) => {
     })
     .catch((err) => {
       watcherState.process.conditions = 'failed';
-      watcherState.form.errors = err.name;
+      watcherState.process.errors = err.name;
     });
 };
 
@@ -73,85 +73,86 @@ export default () => {
     })
     .then(() => {
       yup.setLocale(customMessages);
-    });
+      //    });
 
-  const state = {
-    form: {
-      conditions: '',
-      errors: '',
-    },
-    process: {
-      conditions: '',
-      errors: '',
-    },
-    feeds: [],
-    posts: [],
-    currentPost: {},
-    alreadyReadPosts: new Set(),
-  };
+      const state = {
+        form: {
+          conditions: '',
+          errors: '',
+        },
+        process: {
+          conditions: '',
+          errors: '',
+        },
+        feeds: [],
+        posts: [],
+        currentPost: {},
+        alreadyReadPosts: new Set(),
+      };
 
-  const watcherState = watcher(elements, i18n, state);
+      const watcherState = watcher(elements, i18n, state);
 
-  const updatePosts = () => {
-    const { feeds, posts } = state;
+      const updatePosts = () => {
+        const { feeds, posts } = state;
 
-    const promises = feeds.map((feed) => {
-      const url = getProxyUrl(feed.link);
-      return axios.get(url).then((response) => {
-        const { posts: newPosts } = parser(response.data.contents);
-        newPosts.forEach((newPost) => {
-          const postExists = posts.some((existingPost) => existingPost.link === newPost.link);
-          if (!postExists) {
-            const newPostWithId = { ...newPost, id: _.uniqueId('post_') };
-            watcherState.posts.push(newPostWithId);
-          }
+        const promises = feeds.map((feed) => {
+          const url = getProxyUrl(feed.link);
+          return axios.get(url).then((response) => {
+            const { posts: newPosts } = parser(response.data.contents);
+            newPosts.forEach((newPost) => {
+              const postExists = posts.some((existingPost) => existingPost.link === newPost.link);
+              if (!postExists) {
+                const newPostWithId = { ...newPost, id: _.uniqueId('post_') };
+                watcherState.posts.push(newPostWithId);
+              }
+            });
+          });
         });
+
+        Promise.all(promises)
+          .catch((err) => {
+            watcherState.process.conditions = 'failed';
+            watcherState.process.errors = err.name;
+          })
+          .finally(() => {
+            setTimeout(updatePosts, delay);
+          });
+      };
+
+      elements.form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const form = new FormData(e.target);
+        const url = form.get('url');
+
+        validate(url, watcherState.feeds)
+          .then((error) => {
+            if (error) {
+              watcherState.form.conditions = 'failed';
+              watcherState.form.errors = error;
+            } else {
+              watcherState.form.conditions = 'valid';
+              watcherState.form.errors = null;
+              setTimeout(() => {
+                loadData(url, watcherState);
+              }, 1000);
+            }
+          });
       });
-    });
 
-    Promise.all(promises)
-      .catch((err) => {
-        watcherState.process.conditions = 'failed';
-        watcherState.process.errors = err.name;
-      })
-      .finally(() => {
-        setTimeout(updatePosts, delay);
-      });
-  };
-
-  elements.form.addEventListener('submit', (e) => {
-    e.preventDefault();
-
-    const form = new FormData(e.target);
-    const url = form.get('url');
-
-    validate(url, watcherState.feeds)
-      .then((error) => {
-        if (error) {
-          watcherState.form.conditions = 'failed';
-          watcherState.form.errors = error;
-        } else {
-          watcherState.form.conditions = 'valid';
-          watcherState.form.errors = null;
-          setTimeout(() => {
-            loadData(url, watcherState);
-          }, 1000);
+      elements.posts.addEventListener('click', (e) => {
+        const postId = e.target.dataset.id;
+        if (!postId) {
+          return;
         }
+
+        const post = state.posts.find((p) => p.id === postId);
+        if (!post) {
+          return;
+        }
+        watcherState.currentPost = post;
+        watcherState.alreadyReadPosts.add(postId);
       });
-  });
-
-  elements.posts.addEventListener('click', (e) => {
-    const postId = e.target.dataset.id;
-    if (!postId) {
-      return;
-    }
-
-    const post = state.posts.find((p) => p.id === postId);
-    if (!post) {
-      return;
-    }
-    watcherState.currentPost = post;
-    watcherState.alreadyReadPosts.add(postId);
-  });
-  updatePosts(watcherState);
+      updatePosts(watcherState);
+    });
 };
