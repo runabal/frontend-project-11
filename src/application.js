@@ -73,7 +73,6 @@ export default () => {
     })
     .then(() => {
       yup.setLocale(customMessages);
-      //    });
 
       const state = {
         form: {
@@ -99,12 +98,13 @@ export default () => {
           const url = getProxyUrl(feed.link);
           return axios.get(url).then((response) => {
             const { posts: newPosts } = parser(response.data.contents);
-            newPosts.forEach((newPost) => {
-              const postExists = posts.some((existingPost) => existingPost.link === newPost.link);
-              if (!postExists) {
-                const newPostWithId = { ...newPost, id: _.uniqueId('post_') };
-                watcherState.posts.push(newPostWithId);
-              }
+
+            const existingLinks = new Set(posts.map((post) => post.link));
+            const newUniquePosts = newPosts.filter((newPost) => !existingLinks.has(newPost.link));
+
+            newUniquePosts.forEach((newPost) => {
+              const newPostWithId = { ...newPost, id: _.uniqueId('post_') };
+              watcherState.posts.push(newPostWithId);
             });
           });
         });
