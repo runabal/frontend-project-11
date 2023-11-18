@@ -34,9 +34,6 @@ const loadData = (validUrl, watcherState) => {
     .then((response) => {
       const { feed, posts } = parser(response.data.contents);
 
-      watcherState.process.conditions = 'success';
-      watcherState.form.conditions = '';
-      watcherState.form.errors = null;
       const feedId = _.uniqueId('feed_');
       watcherState.feeds.push({ ...feed, id: feedId, link: validUrl });
 
@@ -44,12 +41,11 @@ const loadData = (validUrl, watcherState) => {
         const uniquePostId = _.uniqueId('post_');
         watcherState.posts.push({ ...post, id: uniquePostId });
       });
+      watcherState.process.conditions = 'success';
     })
     .catch((err) => {
       watcherState.process.conditions = 'failed';
       watcherState.form.errors = err.name;
-      watcherState.form.conditions = '';
-      watcherState.process.errors = null;
     });
 };
 
@@ -134,8 +130,6 @@ export default () => {
         if (error) {
           watcherState.form.conditions = 'failed';
           watcherState.form.errors = error;
-          watcherState.process.conditions = '';
-          watcherState.process.errors = null;
         } else {
           loadData(url, watcherState);
         }
