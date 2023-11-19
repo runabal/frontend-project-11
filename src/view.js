@@ -154,7 +154,7 @@ const renderStatus = (elements, i18n, value) => {
 };
 
 export default (elements, i18n, state) => {
-  const processFormHandler = onChange(state, (path, value) => {
+  const watcherState = onChange(state, (path, value) => {
     switch (path) {
       case 'process.conditions':
         renderStatus(elements, i18n, value);
@@ -185,5 +185,5 @@ export default (elements, i18n, state) => {
         break;
     }
   });
-  return processFormHandler;
+  return watcherState;
 };
