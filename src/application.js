@@ -146,11 +146,11 @@ export default () => {
           return;
         }
 
-        const post = state.posts.find((p) => p.id === postId);
-        if (!post) {
+        const selectedPost = state.posts.find((post) => post.id === postId);
+        if (!selectedPost) {
           return;
         }
-        watcherState.currentPost = post;
+        watcherState.currentPost = selectedPost;
         watcherState.alreadyReadPosts.add(postId);
       });
       updatePosts(watcherState);
