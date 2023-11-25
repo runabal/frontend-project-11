@@ -75,33 +75,12 @@ const renderPosts = (elements, i18n, value, state) => {
   posts.append(header, postsList);
 };
 
-const renderErrors = (elements, i18n, value) => {
-  if (!value) {
+const renderErrors = (elements, i18n, errorCode) => {
+  if (!errorCode) {
     return;
   }
   const { feedback } = elements;
-
-  switch (value) {
-    case 'errors.urlError':
-      feedback.textContent = i18n.t(value);
-      break;
-
-    case 'errors.alreadyExist':
-      feedback.textContent = i18n.t(value);
-      break;
-
-    case 'AxiosError':
-      feedback.textContent = i18n.t('errors.networkError');
-      break;
-
-    case 'Error':
-      feedback.textContent = i18n.t('errors.rssError');
-      break;
-
-    default:
-      feedback.textContent = i18n.t('errors.somethingWrong');
-      break;
-  }
+  feedback.textContent = i18n.t(errorCode);
 };
 
 const handleProcessSubmit = (elements) => {

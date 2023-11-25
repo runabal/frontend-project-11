@@ -24,7 +24,7 @@ export default (rss) => {
   const parserError = doc.querySelector('parsererror');
 
   if (parserError) {
-    throw new Error(parserError);
+    throw new Error('rssError');
   }
   const feed = getFeed(doc);
   const posts = getPosts(doc);

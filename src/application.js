@@ -7,6 +7,30 @@ import watcher from './view.js';
 import languages from './translate/languages.js';
 import customMessages from './translate/customMessages.js';
 
+const getErrorCode = (err) => {
+  if (!err) {
+    return 'errors.somethingWrong';
+  }
+
+  if (err.isAxiosError) {
+    return 'errors.networkError';
+  }
+  if (err.message === 'Network Error') {
+    return 'errors.networkError';
+  }
+
+  if (err.message === customMessages.mixed.notOneOf) {
+    return 'errors.alreadyExist';
+  }
+  if (err.message === customMessages.string.url) {
+    return 'errors.urlError';
+  }
+  if (err.message === 'rssError') {
+    return 'errors.rssError';
+  }
+  return 'errors.somethingWrong';
+};
+
 const proxy = 'https://allorigins.hexlet.app';
 const defaultLanguage = 'ru';
 const delay = 5000;
@@ -45,7 +69,7 @@ const loadData = (validUrl, watcherState) => {
     })
     .catch((err) => {
       watcherState.process.conditions = 'failed';
-      watcherState.process.errors = err.name;
+      watcherState.process.errors = getErrorCode(err);
     });
 };
 
@@ -112,7 +136,7 @@ export default () => {
         Promise.all(promises)
           .catch((err) => {
             watcherState.process.conditions = 'failed';
-            watcherState.process.errors = err.name;
+            watcherState.process.errors = getErrorCode(err);
           })
           .finally(() => {
             setTimeout(updatePosts, delay);
@@ -129,7 +153,7 @@ export default () => {
           .then((error) => {
             if (error) {
               watcherState.form.conditions = 'failed';
-              watcherState.form.errors = error;
+              watcherState.form.errors = getErrorCode(new Error(error));
             } else {
               watcherState.form.conditions = 'valid';
               watcherState.form.errors = null;
