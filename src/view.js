@@ -49,14 +49,14 @@ const renderPosts = (elements, i18n, value, state) => {
     post.classList.add('list-group-item', 'd-flex');
     post.classList.add('justify-content-between', 'align-items-start');
 
-    const titleEl = document.createElement('a');
-    titleEl.dataset.id = id;
-    titleEl.textContent = title;
+    const titleLink = document.createElement('a');
+    titleLink.dataset.id = id;
+    titleLink.textContent = title;
     const textClass = state.alreadyReadPosts.has(id) ? 'fw-normal' : 'fw-bold';
-    titleEl.classList.add(textClass);
-    titleEl.setAttribute('href', link);
-    titleEl.setAttribute('target', '_blank');
-    titleEl.setAttribute('rel', 'noopener noreferrer');
+    titleLink.classList.add(textClass);
+    titleLink.setAttribute('href', link);
+    titleLink.setAttribute('target', '_blank');
+    titleLink.setAttribute('rel', 'noopener noreferrer');
 
     const watchButton = document.createElement('button');
     watchButton.textContent = i18n.t('inspect');
@@ -67,7 +67,7 @@ const renderPosts = (elements, i18n, value, state) => {
     watchButton.dataset.bsToggle = 'modal';
     watchButton.dataset.bsTarget = '#modal';
 
-    post.append(titleEl, watchButton);
+    post.append(titleLink, watchButton);
     fragment.prepend(post);
   });
   posts.innerHTML = '';
