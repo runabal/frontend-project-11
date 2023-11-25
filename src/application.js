@@ -31,6 +31,18 @@ const getErrorCode = (err) => {
   return 'errors.somethingWrong';
 };
 
+const blockForm = (elements) => {
+  elements.input.disable = true;
+  elements.button.disabled = true;
+};
+
+const unblockForm = (elements) => {
+  elements.input.disabled = false;
+  elements.button.disabled = false;
+  elements.form.reset();
+  elements.input.focus();
+};
+
 const proxy = 'https://allorigins.hexlet.app';
 const defaultLanguage = 'ru';
 const delay = 5000;
@@ -68,6 +80,7 @@ const loadData = (validUrl, watcherState) => {
       watcherState.process.conditions = 'success';
     })
     .catch((err) => {
+      //      unblockForm(elements);
       watcherState.process.conditions = 'failed';
       watcherState.process.errors = getErrorCode(err);
     });
@@ -149,9 +162,12 @@ export default () => {
         const form = new FormData(e.target);
         const url = form.get('url');
 
+        blockForm(elements);
+
         validate(url, watcherState.feeds)
           .then((error) => {
             if (error) {
+              unblockForm(elements);
               watcherState.form.conditions = 'failed';
               watcherState.form.errors = getErrorCode(new Error(error));
             } else {
@@ -159,6 +175,7 @@ export default () => {
               watcherState.form.errors = null;
               setTimeout(() => {
                 loadData(url, watcherState);
+                unblockForm(elements);
               }, 1000);
             }
           });

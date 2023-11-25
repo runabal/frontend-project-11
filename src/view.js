@@ -83,13 +83,6 @@ const renderErrors = (elements, i18n, errorCode) => {
   feedback.textContent = i18n.t(errorCode);
 };
 
-const handleProcessSubmit = (elements) => {
-  const { form, input, button } = elements;
-  form.reset();
-  input.focus();
-  button.disabled = false;
-};
-
 const renderStatus = (elements, i18n, value) => {
   const { input, feedback, button } = elements;
 
@@ -148,7 +141,6 @@ export default (elements, i18n, state) => {
         renderErrors(elements, i18n, value);
         break;
       case 'feeds':
-        handleProcessSubmit(elements);
         renderFeeds(elements, i18n, value);
         break;
       case 'posts':
