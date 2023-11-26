@@ -3,7 +3,7 @@ import * as yup from 'yup';
 import axios from 'axios';
 import i18next from 'i18next';
 import parser from './parser.js';
-import watcher from './view.js';
+import watched from './view.js';
 import languages from './translate/languages.js';
 import customMessages from './translate/customMessages.js';
 
@@ -62,27 +62,26 @@ const getProxyUrl = (url) => {
   return proxyUrl.toString();
 };
 
-const loadData = (validUrl, watcherState) => {
-  watcherState.process.conditions = 'loading';
-  watcherState.process.errors = null;
+const loadData = (validUrl, watchedState) => {
+  watchedState.process.conditions = 'loading';
+  watchedState.process.errors = null;
 
   return axios.get(getProxyUrl(validUrl))
     .then((response) => {
       const { feed, posts } = parser(response.data.contents);
 
       const feedId = _.uniqueId('feed_');
-      watcherState.feeds.push({ ...feed, id: feedId, link: validUrl });
+      watchedState.feeds.push({ ...feed, id: feedId, link: validUrl });
 
       posts.forEach((post) => {
         const uniquePostId = _.uniqueId('post_');
-        watcherState.posts.push({ ...post, id: uniquePostId });
+        watchedState.posts.push({ ...post, id: uniquePostId });
       });
-      watcherState.process.conditions = 'success';
+      watchedState.process.conditions = 'success';
     })
     .catch((err) => {
-      //      unblockForm(elements);
-      watcherState.process.conditions = 'failed';
-      watcherState.process.errors = getErrorCode(err);
+      watchedState.process.conditions = 'failed';
+      watchedState.process.errors = getErrorCode(err);
     });
 };
 
@@ -126,7 +125,7 @@ export default () => {
         alreadyReadPosts: new Set(),
       };
 
-      const watcherState = watcher(elements, i18n, state);
+      const watchedState = watched(elements, i18n, state);
 
       const updatePosts = () => {
         const { feeds, posts } = state;
@@ -141,15 +140,15 @@ export default () => {
 
             newUniquePosts.forEach((newPost) => {
               const newPostWithId = { ...newPost, id: _.uniqueId('post_') };
-              watcherState.posts.push(newPostWithId);
+              watchedState.posts.push(newPostWithId);
             });
           });
         });
 
         Promise.all(promises)
           .catch((err) => {
-            watcherState.process.conditions = 'failed';
-            watcherState.process.errors = getErrorCode(err);
+            watchedState.process.conditions = 'failed';
+            watchedState.process.errors = getErrorCode(err);
           })
           .finally(() => {
             setTimeout(updatePosts, delay);
@@ -164,17 +163,17 @@ export default () => {
 
         blockForm(elements);
 
-        validate(url, watcherState.feeds)
+        validate(url, watchedState.feeds)
           .then((error) => {
             if (error) {
               unblockForm(elements);
-              watcherState.form.conditions = 'failed';
-              watcherState.form.errors = getErrorCode(new Error(error));
+              watchedState.form.conditions = 'failed';
+              watchedState.form.errors = getErrorCode(new Error(error));
             } else {
-              watcherState.form.conditions = 'valid';
-              watcherState.form.errors = null;
+              watchedState.form.conditions = 'valid';
+              watchedState.form.errors = null;
               setTimeout(() => {
-                loadData(url, watcherState);
+                loadData(url, watchedState);
                 unblockForm(elements);
               }, 1000);
             }
@@ -191,9 +190,9 @@ export default () => {
         if (!selectedPost) {
           return;
         }
-        watcherState.currentPost = selectedPost;
-        watcherState.alreadyReadPosts.add(postId);
+        watchedState.currentPost = selectedPost;
+        watchedState.alreadyReadPosts.add(postId);
       });
-      updatePosts(watcherState);
+      updatePosts(watchedState);
     });
 };

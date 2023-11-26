@@ -126,7 +126,7 @@ const renderStatus = (elements, i18n, value) => {
 };
 
 export default (elements, i18n, state) => {
-  const watcherState = onChange(state, (path, value) => {
+  const watchedState = onChange(state, (path, value) => {
     switch (path) {
       case 'process.conditions':
         renderStatus(elements, i18n, value);
@@ -156,5 +156,5 @@ export default (elements, i18n, state) => {
         break;
     }
   });
-  return watcherState;
+  return watchedState;
 };
