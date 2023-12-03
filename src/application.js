@@ -59,7 +59,7 @@ const loadData = (validUrl, watchedState) => {
 
       posts.forEach((post) => {
         const uniquePostId = _.uniqueId('post_');
-        watchedState.posts.push({ ...post, id: uniquePostId });
+        watchedState.posts.push({ ...post, id: uniquePostId, feedId });
       });
       watchedState.process.conditions = 'success';
     })
@@ -119,11 +119,15 @@ export default () => {
           return axios.get(url).then((response) => {
             const { posts: newPosts } = parser(response.data.contents);
 
-            const existingLinks = new Set(posts.map((post) => post.link));
+            const existingLinks = new Set(
+              posts
+                .filter((post) => post.feedId === feed.id)
+                .map((post) => post.link),
+            );
             const newUniquePosts = newPosts.filter((newPost) => !existingLinks.has(newPost.link));
 
             newUniquePosts.forEach((newPost) => {
-              const newPostWithId = { ...newPost, id: _.uniqueId('post_') };
+              const newPostWithId = { ...newPost, id: _.uniqueId('post_'), feedId: feed.id };
               watchedState.posts.push(newPostWithId);
             });
           });
