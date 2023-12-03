@@ -8,15 +8,15 @@ const renderFeeds = (elements, i18n, value) => {
   const feedList = document.createElement('ul');
   feedList.classList.add('list-group', 'mb-5');
 
-  value.forEach((item) => {
+  value.forEach((postItem) => {
     const feed = document.createElement('li');
     feed.classList.add('list-group-item');
 
     const feedHeader = document.createElement('h3');
-    feedHeader.textContent = item.title;
+    feedHeader.textContent = postItem.title;
 
     const feedDescription = document.createElement('p');
-    feedDescription.textContent = item.description;
+    feedDescription.textContent = postItem.description;
 
     feed.append(feedHeader, feedDescription);
     feedList.prepend(feed);
@@ -42,8 +42,8 @@ const renderPosts = (elements, i18n, value, state) => {
   const postsList = document.createElement('ul');
   postsList.classList.add('list-group');
 
-  value.forEach((item) => {
-    const { title, link, id } = item;
+  value.forEach((postItem) => {
+    const { title, link, id } = postItem;
 
     const post = document.createElement('li');
     post.classList.add('list-group-item', 'd-flex');
