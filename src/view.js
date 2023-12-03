@@ -76,11 +76,12 @@ const renderPosts = (elements, i18n, value, state) => {
 };
 
 const renderErrors = (elements, i18n, errorCode) => {
-  if (!errorCode) {
+  const { feedback } = elements;
+  if (errorCode) {
+    feedback.textContent = i18n.t(errorCode);
     return;
   }
-  const { feedback } = elements;
-  feedback.textContent = i18n.t(errorCode);
+  feedback.textContent = '';
 };
 
 const renderStatus = (elements, i18n, value) => {
@@ -134,10 +135,10 @@ const renderStatus = (elements, i18n, value) => {
 export default (elements, i18n, state) => {
   const watchedState = onChange(state, (path, value) => {
     switch (path) {
-      case 'process.conditions':
+      case 'process.conditionsStatus':
         renderStatus(elements, i18n, value);
         break;
-      case 'form.conditions':
+      case 'form.conditionsStatus':
         renderStatus(elements, i18n, value);
         break;
       case 'process.errors':

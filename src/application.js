@@ -47,7 +47,7 @@ const getProxyUrl = (url) => {
 };
 
 const loadData = (validUrl, watchedState) => {
-  watchedState.process.conditions = 'loading';
+  watchedState.process.conditionsStatus = 'loading';
   watchedState.process.errors = null;
 
   return axios.get(getProxyUrl(validUrl), { timeout: 10000 })
@@ -61,10 +61,10 @@ const loadData = (validUrl, watchedState) => {
         const uniquePostId = _.uniqueId('post_');
         watchedState.posts.push({ ...post, id: uniquePostId, feedId });
       });
-      watchedState.process.conditions = 'success';
+      watchedState.process.conditionsStatus = 'success';
     })
     .catch((err) => {
-      watchedState.process.conditions = 'failed';
+      watchedState.process.conditionsStatus = 'failed';
       watchedState.process.errors = getErrorCode(err);
     });
 };
@@ -96,11 +96,11 @@ export default () => {
 
       const state = {
         form: {
-          conditions: '',
+          conditionsStatus: '',
           errors: '',
         },
         process: {
-          conditions: '',
+          conditionsStatus: '',
           errors: '',
         },
         feeds: [],
@@ -135,7 +135,7 @@ export default () => {
 
         Promise.all(promises)
           .catch((err) => {
-            watchedState.process.conditions = 'failed';
+            watchedState.process.conditionsStatus = 'failed';
             watchedState.process.errors = getErrorCode(err);
           })
           .finally(() => {
@@ -153,10 +153,10 @@ export default () => {
         validate(url, feedUrls)
           .then((error) => {
             if (error) {
-              watchedState.form.conditions = 'failed';
+              watchedState.form.conditionsStatus = 'failed';
               watchedState.form.errors = getErrorCode(new Error(error));
             } else {
-              watchedState.form.conditions = 'valid';
+              watchedState.form.conditionsStatus = 'valid';
               watchedState.form.errors = null;
               loadData(url, watchedState);
             }
