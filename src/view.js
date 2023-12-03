@@ -99,6 +99,7 @@ const renderStatus = (elements, i18n, value) => {
       break;
 
     case 'loading':
+      input.disabled = true;
       button.disabled = true;
       feedback.classList.remove('text-danger');
       feedback.classList.remove('text-success');
@@ -107,6 +108,10 @@ const renderStatus = (elements, i18n, value) => {
       break;
 
     case 'success':
+      elements.form.reset();
+      input.disabled = false;
+      button.disabled = false;
+      input.focus();
       input.classList.remove('is-invalid');
       feedback.classList.replace('text-secondary', 'text-success');
       feedback.textContent = i18n.t(value);
@@ -117,6 +122,7 @@ const renderStatus = (elements, i18n, value) => {
       feedback.classList.remove('text-success');
       feedback.classList.remove('text-secondary');
       feedback.classList.add('text-danger');
+      input.disabled = false;
       button.disabled = false;
       break;
 

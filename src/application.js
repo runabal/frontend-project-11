@@ -15,9 +15,6 @@ const getErrorCode = (err) => {
   if (err.isAxiosError) {
     return 'errors.networkError';
   }
-  if (err.message === 'Network Error') {
-    return 'errors.networkError';
-  }
 
   if (err.message === customMessages.mixed.notOneOf) {
     return 'errors.alreadyExist';
@@ -29,18 +26,6 @@ const getErrorCode = (err) => {
     return 'errors.rssError';
   }
   return 'errors.somethingWrong';
-};
-
-const blockForm = (elements) => {
-  elements.input.disable = true;
-  elements.button.disabled = true;
-};
-
-const unblockForm = (elements) => {
-  elements.input.disabled = false;
-  elements.button.disabled = false;
-  elements.form.reset();
-  elements.input.focus();
 };
 
 const proxy = 'https://allorigins.hexlet.app';
@@ -161,21 +146,15 @@ export default () => {
         const form = new FormData(e.target);
         const url = form.get('url');
 
-        blockForm(elements);
-
         validate(url, watchedState.feeds)
           .then((error) => {
             if (error) {
-              unblockForm(elements);
               watchedState.form.conditions = 'failed';
               watchedState.form.errors = getErrorCode(new Error(error));
             } else {
               watchedState.form.conditions = 'valid';
               watchedState.form.errors = null;
-              setTimeout(() => {
-                loadData(url, watchedState);
-                unblockForm(elements);
-              }, 1000);
+              loadData(url, watchedState);
             }
           });
       });
