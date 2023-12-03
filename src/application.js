@@ -33,7 +33,6 @@ const getErrorCode = (err) => {
 };
 
 const validate = (url, urls) => {
-//  const feedLinks = feeds.map((feed) => feed.link);
   const schema = yup.string().required().url().notOneOf(urls);
   return schema.validate(url, { abortEarly: false })
     .then(() => null)
@@ -74,7 +73,7 @@ export default () => {
   const elements = {
     form: document.querySelector('.rss-form'),
     input: document.querySelector('#url-input'),
-    button: document.querySelector('.h-100'),
+    button: document.querySelector('#rss-button'),
     feedback: document.querySelector('.feedback'),
     feeds: document.querySelector('.feeds'),
     posts: document.querySelector('.posts'),
