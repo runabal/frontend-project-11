@@ -7,6 +7,10 @@ import watched from './view.js';
 import languages from './translate/languages.js';
 import customMessages from './translate/customMessages.js';
 
+const proxy = 'https://allorigins.hexlet.app';
+const defaultLanguage = 'ru';
+const delay = 5000;
+
 const getErrorCode = (err) => {
   if (!err) {
     return 'errors.somethingWrong';
@@ -28,13 +32,9 @@ const getErrorCode = (err) => {
   return 'errors.somethingWrong';
 };
 
-const proxy = 'https://allorigins.hexlet.app';
-const defaultLanguage = 'ru';
-const delay = 5000;
-
-const validate = (url, feeds) => {
-  const feedLinks = feeds.map((feed) => feed.link);
-  const schema = yup.string().required().url().notOneOf(feedLinks);
+const validate = (url, urls) => {
+//  const feedLinks = feeds.map((feed) => feed.link);
+  const schema = yup.string().required().url().notOneOf(urls);
   return schema.validate(url, { abortEarly: false })
     .then(() => null)
     .catch((err) => err.errors.join());
@@ -145,8 +145,9 @@ export default () => {
 
         const form = new FormData(e.target);
         const url = form.get('url');
+        const feedUrls = watchedState.feeds.map((feed) => feed.link);
 
-        validate(url, watchedState.feeds)
+        validate(url, feedUrls)
           .then((error) => {
             if (error) {
               watchedState.form.conditions = 'failed';
