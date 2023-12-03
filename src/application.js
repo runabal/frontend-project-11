@@ -50,7 +50,7 @@ const loadData = (validUrl, watchedState) => {
   watchedState.process.conditions = 'loading';
   watchedState.process.errors = null;
 
-  return axios.get(getProxyUrl(validUrl))
+  return axios.get(getProxyUrl(validUrl), { timeout: 10000 })
     .then((response) => {
       const { feed, posts } = parser(response.data.contents);
 
@@ -116,7 +116,7 @@ export default () => {
 
         const promises = feeds.map((feed) => {
           const url = getProxyUrl(feed.link);
-          return axios.get(url).then((response) => {
+          return axios.get(url, { timeout: 10000 }).then((response) => {
             const { posts: newPosts } = parser(response.data.contents);
 
             const existingLinks = new Set(
