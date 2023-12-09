@@ -20,12 +20,6 @@ const getErrorCode = (err) => {
     return 'errors.networkError';
   }
 
-  if (err.message === customMessages.mixed.notOneOf) {
-    return 'errors.alreadyExist';
-  }
-  if (err.message === customMessages.string.url) {
-    return 'errors.urlError';
-  }
   if (err.message === 'rssError') {
     return 'errors.rssError';
   }
@@ -154,7 +148,7 @@ export default () => {
           .then((error) => {
             if (error) {
               watchedState.form.conditionsStatus = 'failed';
-              watchedState.form.errors = getErrorCode(new Error(error));
+              watchedState.form.errors = error;
             } else {
               watchedState.form.conditionsStatus = 'valid';
               watchedState.form.errors = null;
